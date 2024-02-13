@@ -4,60 +4,55 @@
     <meta charset="utf-8">
     <title>AR Button Example</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+      .arjs-loader {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .arjs-loader div {
+        text-align: center;
+        font-size: 1.25em;
+        color: white;
+      }
+    </style>
   </head>
-  <body>
-    <a-scene>
-      <!-- Button to show dropdowns -->
-      <a-entity id="initialButton" geometry="primitive: box; width: 2; height: 0.5; depth: 0.1" material="color: blue" position="0 1.5 -5" text="value: Click Me; align: center; width: 6" onclick="showDropdowns()"></a-entity>
-
-      <!-- Dropdown for selecting 'from' location -->
-      <a-entity id="fromDropdown" geometry="primitive: plane; width: 2; height: 0.5;" material="color: white" position="0 1.2 -5" visible="false">
-        <a-entity text="value: From:; align: center; width: 6" position="-0.8 0 0"></a-entity>
-        <a-entity id="fromSelect" geometry="primitive: plane; width: 1.5; height: 0.3;" material="color: gray" position="0.8 0 0">
-          <a-entity text="value: Entrance; align: center; width: 6" position="0 0.1 0" onclick="setLocation('from', 'Entrance')"></a-entity>
-          <a-entity text="value: Room 1; align: center; width: 6" position="0 -0.2 0" onclick="setLocation('from', 'Room 1')"></a-entity>
-          <a-entity text="value: Room 2; align: center; width: 6" position="0 -0.5 0" onclick="setLocation('from', 'Room 2')"></a-entity>
+  <body style="margin: 0; overflow: hidden;">
+    <div class="arjs-loader">
+      <div>Loading, please wait...</div>
+    </div>
+    <a-scene
+      vr-mode-ui="enabled: false;"
+      renderer="logarithmicDepthBuffer: true;"
+      embedded
+      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+    >
+      <a-nft
+        type="nft"
+        url="https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/trex-image/trex"
+        smooth="true"
+        smoothCount="10"
+        smoothTolerance=".01"
+        smoothThreshold="5"
+      >
+        <a-entity
+          gltf-model="https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
+          scale="5 5 5"
+          position="50 150 0"
+        >
         </a-entity>
-      </a-entity>
-
-      <!-- Dropdown for selecting 'to' location -->
-      <a-entity id="toDropdown" geometry="primitive: plane; width: 2; height: 0.5;" material="color: white" position="0 0.9 -5" visible="false">
-        <a-entity text="value: To:; align: center; width: 6" position="-0.8 0 0"></a-entity>
-        <a-entity id="toSelect" geometry="primitive: plane; width: 1.5; height: 0.3;" material="color: gray" position="0.8 0 0">
-          <a-entity text="value: Entrance; align: center; width: 6" position="0 0.1 0" onclick="setLocation('to', 'Entrance')"></a-entity>
-          <a-entity text="value: Room 1; align: center; width: 6" position="0 -0.2 0" onclick="setLocation('to', 'Room 1')"></a-entity>
-          <a-entity text="value: Room 2; align: center; width: 6" position="0 -0.5 0" onclick="setLocation('to', 'Room 2')"></a-entity>
-        </a-entity>
-      </a-entity>
-
-      <!-- Button to perform search -->
-      <a-entity id="searchButton" geometry="primitive: box; width: 2; height: 0.5; depth: 0.1" material="color: green" position="0 0.2 -5" text="value: Search; align: center; width: 6" visible="false" onclick="performSearch()"></a-entity>
-
-      <!-- Text to display selected locations -->
-      <a-entity id="resultText" text="value: ; align: center; width: 6" position="0 -0.6 -5" visible="false"></a-entity>
-
-      <!-- Camera -->
-      <a-entity camera look-controls position="0 1.6 0"></a-entity>
+      </a-nft>
+      <a-entity camera></a-entity>
     </a-scene>
-
-    <script>
-      function showDropdowns() {
-        document.getElementById('fromDropdown').setAttribute('visible', 'true');
-        document.getElementById('toDropdown').setAttribute('visible', 'true');
-        document.getElementById('initialButton').setAttribute('visible', 'false');
-        document.getElementById('searchButton').setAttribute('visible', 'true');
-      }
-
-      function setLocation(locationType, location) {
-        document.getElementById(locationType + 'Select').setAttribute('visible', 'false');
-        document.getElementById(locationType + 'Dropdown').setAttribute('visible', 'false');
-        document.getElementById('resultText').setAttribute('text', 'value', 'From: ' + document.getElementById('fromSelect').querySelector('[text]').getAttribute('value') + ' To: ' + document.getElementById('toSelect').querySelector('[text]').getAttribute('value'));
-        document.getElementById('resultText').setAttribute('visible', 'true');
-      }
-
-      function performSearch() {
-        alert(document.getElementById('resultText').getAttribute('text').value);
-      }
-    </script>
   </body>
 </html>
