@@ -19,17 +19,11 @@
       <!-- Second Room -->
       <a-sphere id="room2" position="2 0 0" color="blue"></a-sphere>
 
-      <!-- Navigation Arrows -->
-      <!-- Arrow from entrance to room1 -->
-      <a-entity id="arrow1" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="-1 0 -2" rotation="0 45 0" visible="false"></a-entity>
-      <!-- Arrow from entrance to room2 -->
-      <a-entity id="arrow2" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="1 0 -2" rotation="0 -45 0" visible="false"></a-entity>
-
-      <!-- Button for selecting locations -->
-      <button id="selectButton" onclick="showDropdowns()">Select Locations</button>
+      <!-- Button to show dropdowns -->
+      <button onclick="showDropdowns()" id="selectButton" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">Select Location</button>
 
       <!-- Dropdown for selecting 'from' location -->
-      <div id="fromDropdown" style="display:none;">
+      <div id="fromDropdown" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         From:
         <select id="fromSelect">
           <option value="entrance">Entrance</option>
@@ -39,7 +33,7 @@
       </div>
 
       <!-- Dropdown for selecting 'to' location -->
-      <div id="toDropdown" style="display:none;">
+      <div id="toDropdown" style="display:none; position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%);">
         To:
         <select id="toSelect">
           <option value="entrance">Entrance</option>
@@ -47,6 +41,9 @@
           <option value="room2">Room 2</option>
         </select>
       </div>
+
+      <!-- Button to show map after location selection -->
+      <button onclick="showMap()" id="showMapButton" style="display:none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);">Show Map</button>
 
       <!-- Camera -->
       <a-entity camera look-controls position="0 1.6 0"></a-entity>
@@ -56,7 +53,15 @@
       function showDropdowns() {
         document.getElementById('fromDropdown').style.display = 'block';
         document.getElementById('toDropdown').style.display = 'block';
-        document.getElementById('selectButton').style.display = 'none'; // Hide the button after showing dropdowns
+        document.getElementById('selectButton').style.display = 'none';
+      }
+
+      function showMap() {
+        // Code to display the map
+        // For now, let's just alert the selected locations
+        var fromLocation = document.getElementById('fromSelect').value;
+        var toLocation = document.getElementById('toSelect').value;
+        alert('Showing map from ' + fromLocation + ' to ' + toLocation);
       }
     </script>
   </body>
