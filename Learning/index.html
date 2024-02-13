@@ -12,6 +12,23 @@
       justify-content: center;
       height: 100vh;
       margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    h1, p {
+      margin-bottom: 20px;
+    }
+
+    select, button {
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+
+    a-scene {
+      width: 100vw;
+      height: 80vh;
+      margin-top: 20px;
     }
   </style>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
@@ -20,18 +37,18 @@
 <body>
   <h1>Welcome to the Mall Navigation App</h1>
   <p>Please select your destination:</p>
-  <select id="destination">
+  <select id="destination" style="width: 200px;">
     <option value="store1">Store 1</option>
     <option value="store2">Store 2</option>
     <option value="store3">Store 3</option>
     <!-- Add more options for other stores or points of interest -->
   </select>
-  <button onclick="navigateToDestination()">Navigate</button>
+  <button onclick="navigateToDestination()" style="font-size: 16px;">Navigate</button>
 
   <a-scene vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false;">
     <a-marker preset="hiro">
       <!-- AR button -->
-      <a-box material="color: green" scale="0.2 0.1 0.05" position="0 0 0.2" clickable></a-box>
+      <a-box material="color: green" scale="0.3 0.15 0.1" position="0 0 0.3" clickable></a-box>
     </a-marker>
     <a-entity camera></a-entity>
   </a-scene>
