@@ -26,7 +26,7 @@
       <a-entity id="arrow2" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="1 0 -2" rotation="0 -45 0" visible="false"></a-entity>
 
       <!-- Button for selecting locations -->
-      <button onclick="showDropdowns()">Select Locations</button>
+      <button id="selectButton" onclick="showDropdowns()">Select Locations</button>
 
       <!-- Dropdown for selecting 'from' location -->
       <div id="fromDropdown" style="display:none;">
@@ -56,6 +56,7 @@
       function showDropdowns() {
         document.getElementById('fromDropdown').style.display = 'block';
         document.getElementById('toDropdown').style.display = 'block';
+        document.getElementById('selectButton').style.display = 'none'; // Hide the button after showing dropdowns
       }
     </script>
   </body>
