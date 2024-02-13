@@ -1,77 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Mall Navigation</title>
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0; /* Background color for the page */
-    }
-    
-    h1, p {
-      margin-bottom: 20px;
-      color: #333; /* Text color for headings and paragraphs */
-    }
-
-    select, button {
-      margin-bottom: 20px;
-      padding: 15px 30px;
-      font-size: 18px;
-      background-color: #4CAF50; /* Green */
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    a-scene {
-      width: 100vw;
-      height: 80vh;
-      margin-top: 20px;
-    }
-  </style>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <title>AR.js Example</title>
+  <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
-  <h1>Welcome to the Mall Navigation App</h1>
-  <p>Please select your destination:</p>
-  <select id="destination" style="width: 250px;">
-    <option value="store1">Store 1</option>
-    <option value="store2">Store 2</option>
-    <option value="store3">Store 3</option>
-    <!-- Add more options for other stores or points of interest -->
-  </select>
-  <button id="navigateButton" style="font-size: 18px;">Navigate</button>
+  <div style='position: fixed; top: 10px; width:100%; text-align: center; z-index: 1;'>
+    <button id="hideButton">HIDE OBJECTS</button>
+  </div>
 
-  <a-scene vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false;">
-    <a-marker preset="hiro">
-      <!-- AR button -->
-      <a-box material="color: #FFD700; opacity: 0.8;" scale="0.5 0.25 0.1" position="0 0 0.5" id="arButton" gesture-detector></a-box>
-    </a-marker>
-    <a-entity camera></a-entity>
+  <!-- Define your 3D scene and enable AR.js -->
+  <a-scene embedded arjs='trackingMethod: best;'>
+
+    <!-- Create an anchor to attach your augmented reality -->
+    <a-anchor hit-testing-enabled='true'>
+
+      <!-- Add your augmented reality objects here -->
+      <a-box position='0 0.5 0' material='opacity: 0.5; side: double; color: red;'>
+        <a-torus-knot radius='0.26' radius-tubular='0.05'>
+          <a-animation attribute="rotation" to="360 0 0" dur="5000" easing='linear' repeat="indefinite"></a-animation>
+        </a-torus-knot>
+      </a-box>
+
+    </a-anchor>
+
+    <!-- Define a static camera -->
+    <a-camera-static></a-camera-static>
+
   </a-scene>
 
   <script>
-    function navigateToDestination() {
-      var destination = document.getElementById('destination').value;
-      // Logic to navigate to the selected destination
-      console.log('Navigating to', destination);
-    }
-
-    // Click event listener for the button
-    document.getElementById('navigateButton').addEventListener('click', navigateToDestination);
-
-    // Touch event listener for the button
-    document.getElementById('navigateButton').addEventListener('touchstart', navigateToDestination);
+    // Add click event listener to the button
+    document.getElementById("hideButton").addEventListener("click", function(e) {
+      console.log("HIDE OBJECTS");
+      // Write code to hide objects here
+    });
   </script>
 </body>
 </html>
