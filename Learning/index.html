@@ -50,7 +50,7 @@
     <option value="store3">Store 3</option>
     <!-- Add more options for other stores or points of interest -->
   </select>
-  <button onclick="navigateToDestination()" style="font-size: 18px;">Navigate</button>
+  <button id="navigateButton" style="font-size: 18px;">Navigate</button>
 
   <a-scene vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false;">
     <a-marker preset="hiro">
@@ -66,6 +66,12 @@
       // Logic to navigate to the selected destination
       console.log('Navigating to', destination);
     }
+
+    // Click event listener for the button
+    document.getElementById('navigateButton').addEventListener('click', navigateToDestination);
+
+    // Touch event listener for the button
+    document.getElementById('navigateButton').addEventListener('touchstart', navigateToDestination);
   </script>
 </body>
 </html>
