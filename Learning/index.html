@@ -13,16 +13,23 @@
       height: 100vh;
       margin: 0;
       font-family: Arial, sans-serif;
+      background-color: #f0f0f0; /* Background color for the page */
     }
     
     h1, p {
       margin-bottom: 20px;
+      color: #333; /* Text color for headings and paragraphs */
     }
 
     select, button {
       margin-bottom: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #4CAF50; /* Green */
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
 
     a-scene {
@@ -37,18 +44,18 @@
 <body>
   <h1>Welcome to the Mall Navigation App</h1>
   <p>Please select your destination:</p>
-  <select id="destination" style="width: 200px;">
+  <select id="destination" style="width: 250px;">
     <option value="store1">Store 1</option>
     <option value="store2">Store 2</option>
     <option value="store3">Store 3</option>
     <!-- Add more options for other stores or points of interest -->
   </select>
-  <button onclick="navigateToDestination()" style="font-size: 16px;">Navigate</button>
+  <button onclick="navigateToDestination()" style="font-size: 18px;">Navigate</button>
 
   <a-scene vr-mode-ui="enabled: false" arjs="sourceType: webcam; debugUIEnabled: false;">
     <a-marker preset="hiro">
       <!-- AR button -->
-      <a-box material="color: green" scale="0.3 0.15 0.1" position="0 0 0.3" clickable></a-box>
+      <a-box material="color: #FFD700; opacity: 0.8;" scale="0.5 0.25 0.1" position="0 0 0.5" clickable></a-box>
     </a-marker>
     <a-entity camera></a-entity>
   </a-scene>
