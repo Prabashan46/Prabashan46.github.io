@@ -2,12 +2,15 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Adding Text in A-Frame</title>
+    <title>Adding Images in A-Frame</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   </head>
   <body>
     <a-scene>
-      <a-text value="Hello, A-Frame!" color="black" position="-1 1 -3"></a-text>
+      <a-assets>
+        <img id="texture" src="hi.jpg">
+      </a-assets>
+      <a-plane src="#texture" position="0 0 -4" rotation="-90 0 0" width="4" height="4"></a-plane>
     </a-scene>
   </body>
 </html>
