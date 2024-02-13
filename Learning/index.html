@@ -2,18 +2,24 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Adding Images in A-Frame</title>
+    <title>Virtual Navigation System</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   </head>
   <body>
     <a-scene>
-      <a-assets>
-        <img id="texture" src="hi.jpg">
-        <img id="texture1" src="hi.jpg">
-      </a-assets>
-      <a-plane src="#texture" position="6 5 -5" rotation="0 0 0" width="4" height="4"></a-plane>
+      <!-- Waypoint Markers -->
+      <a-sphere id="start" position="-2 0 -2" color="green"></a-sphere>
+      <a-sphere id="waypoint1" position="0 0 -4" color="blue"></a-sphere>
+      <a-sphere id="waypoint2" position="2 0 -2" color="blue"></a-sphere>
+      <a-sphere id="end" position="0 0 0" color="red"></a-sphere>
 
-      <a-plane src="#texture1" position="-10 0 -4" rotation="90 0 0" width="4" height="4"></a-plane>
+      <!-- Navigation Arrows -->
+      <a-entity id="arrow1" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="-2 0 -2" rotation="0 45 0"></a-entity>
+      <a-entity id="arrow2" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="0 0 -4" rotation="0 135 0"></a-entity>
+      <a-entity id="arrow3" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="2 0 -2" rotation="0 225 0"></a-entity>
+
+      <!-- Camera -->
+      <a-entity camera look-controls position="0 1.6 0"></a-entity>
     </a-scene>
   </body>
 </html>
