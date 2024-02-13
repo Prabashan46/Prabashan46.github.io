@@ -2,48 +2,39 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>House Navigation</title>
+    <title>AR Button Example</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   </head>
   <body>
     <a-scene>
-      <!-- Entrance -->
-      <a-sphere id="entrance" position="0 0 -2" color="green"></a-sphere>
-      
-      <!-- Hallway -->
-      <a-box id="hallway" position="0 0 -4" width="4" height="1" depth="8" color="gray"></a-box>
-
-      <!-- First Room -->
-      <a-sphere id="room1" position="-2 0 0" color="blue"></a-sphere>
-
-      <!-- Second Room -->
-      <a-sphere id="room2" position="2 0 0" color="blue"></a-sphere>
-
       <!-- Button to show dropdowns -->
-      <button onclick="showDropdowns()" id="selectButton" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">Select Location</button>
+      <a-entity id="initialButton" geometry="primitive: box; width: 2; height: 0.5; depth: 0.1" material="color: blue" position="0 1.5 -5" text="value: Click Me; align: center; width: 6" onclick="showDropdowns()"></a-entity>
 
       <!-- Dropdown for selecting 'from' location -->
-      <div id="fromDropdown" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-        From:
-        <select id="fromSelect">
-          <option value="entrance">Entrance</option>
-          <option value="room1">Room 1</option>
-          <option value="room2">Room 2</option>
-        </select>
-      </div>
+      <a-entity id="fromDropdown" geometry="primitive: plane; width: 2; height: 0.5;" material="color: white" position="0 1.2 -5" visible="false">
+        <a-entity text="value: From:; align: center; width: 6" position="-0.8 0 0"></a-entity>
+        <a-entity id="fromSelect" geometry="primitive: plane; width: 1.5; height: 0.3;" material="color: gray" position="0.8 0 0">
+          <a-entity text="value: Entrance; align: center; width: 6" position="0 0.1 0" onclick="setLocation('from', 'Entrance')"></a-entity>
+          <a-entity text="value: Room 1; align: center; width: 6" position="0 -0.2 0" onclick="setLocation('from', 'Room 1')"></a-entity>
+          <a-entity text="value: Room 2; align: center; width: 6" position="0 -0.5 0" onclick="setLocation('from', 'Room 2')"></a-entity>
+        </a-entity>
+      </a-entity>
 
       <!-- Dropdown for selecting 'to' location -->
-      <div id="toDropdown" style="display:none; position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%);">
-        To:
-        <select id="toSelect">
-          <option value="entrance">Entrance</option>
-          <option value="room1">Room 1</option>
-          <option value="room2">Room 2</option>
-        </select>
-      </div>
+      <a-entity id="toDropdown" geometry="primitive: plane; width: 2; height: 0.5;" material="color: white" position="0 0.9 -5" visible="false">
+        <a-entity text="value: To:; align: center; width: 6" position="-0.8 0 0"></a-entity>
+        <a-entity id="toSelect" geometry="primitive: plane; width: 1.5; height: 0.3;" material="color: gray" position="0.8 0 0">
+          <a-entity text="value: Entrance; align: center; width: 6" position="0 0.1 0" onclick="setLocation('to', 'Entrance')"></a-entity>
+          <a-entity text="value: Room 1; align: center; width: 6" position="0 -0.2 0" onclick="setLocation('to', 'Room 1')"></a-entity>
+          <a-entity text="value: Room 2; align: center; width: 6" position="0 -0.5 0" onclick="setLocation('to', 'Room 2')"></a-entity>
+        </a-entity>
+      </a-entity>
 
-      <!-- Button to show map after location selection -->
-      <button onclick="showMap()" id="showMapButton" style="display:none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);">Show Map</button>
+      <!-- Button to perform search -->
+      <a-entity id="searchButton" geometry="primitive: box; width: 2; height: 0.5; depth: 0.1" material="color: green" position="0 0.2 -5" text="value: Search; align: center; width: 6" visible="false" onclick="performSearch()"></a-entity>
+
+      <!-- Text to display selected locations -->
+      <a-entity id="resultText" text="value: ; align: center; width: 6" position="0 -0.6 -5" visible="false"></a-entity>
 
       <!-- Camera -->
       <a-entity camera look-controls position="0 1.6 0"></a-entity>
@@ -51,17 +42,21 @@
 
     <script>
       function showDropdowns() {
-        document.getElementById('fromDropdown').style.display = 'block';
-        document.getElementById('toDropdown').style.display = 'block';
-        document.getElementById('selectButton').style.display = 'none';
+        document.getElementById('fromDropdown').setAttribute('visible', 'true');
+        document.getElementById('toDropdown').setAttribute('visible', 'true');
+        document.getElementById('initialButton').setAttribute('visible', 'false');
+        document.getElementById('searchButton').setAttribute('visible', 'true');
       }
 
-      function showMap() {
-        // Code to display the map
-        // For now, let's just alert the selected locations
-        var fromLocation = document.getElementById('fromSelect').value;
-        var toLocation = document.getElementById('toSelect').value;
-        alert('Showing map from ' + fromLocation + ' to ' + toLocation);
+      function setLocation(locationType, location) {
+        document.getElementById(locationType + 'Select').setAttribute('visible', 'false');
+        document.getElementById(locationType + 'Dropdown').setAttribute('visible', 'false');
+        document.getElementById('resultText').setAttribute('text', 'value', 'From: ' + document.getElementById('fromSelect').querySelector('[text]').getAttribute('value') + ' To: ' + document.getElementById('toSelect').querySelector('[text]').getAttribute('value'));
+        document.getElementById('resultText').setAttribute('visible', 'true');
+      }
+
+      function performSearch() {
+        alert(document.getElementById('resultText').getAttribute('text').value);
       }
     </script>
   </body>
