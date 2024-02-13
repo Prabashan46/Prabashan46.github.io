@@ -2,24 +2,54 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Virtual Navigation System</title>
+    <title>House Navigation</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   </head>
   <body>
     <a-scene>
-      <!-- Waypoint Markers -->
-      <a-sphere id="start" position="-2 0 -2" color="green"></a-sphere>
-      <a-sphere id="waypoint1" position="0 0 -4" color="blue"></a-sphere>
-      <a-sphere id="waypoint2" position="2 0 -2" color="blue"></a-sphere>
-      <a-sphere id="end" position="0 0 0" color="red"></a-sphere>
+      <!-- Entrance -->
+      <a-sphere id="entrance" position="0 0 -2" color="green"></a-sphere>
+      
+      <!-- Hallway -->
+      <a-box id="hallway" position="0 0 -4" width="4" height="1" depth="8" color="gray"></a-box>
+
+      <!-- First Room -->
+      <a-sphere id="room1" position="-2 0 0" color="blue"></a-sphere>
+
+      <!-- Second Room -->
+      <a-sphere id="room2" position="2 0 0" color="blue"></a-sphere>
 
       <!-- Navigation Arrows -->
-      <a-entity id="arrow1" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="-2 0 -2" rotation="0 45 0"></a-entity>
-      <a-entity id="arrow2" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="0 0 -4" rotation="0 135 0"></a-entity>
-      <a-entity id="arrow3" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="2 0 -2" rotation="0 225 0"></a-entity>
+      <!-- Arrow from entrance to room1 -->
+      <a-entity id="arrow1" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="-1.5 0 -1.5" rotation="0 45 0" visible="false"></a-entity>
+      <!-- Arrow from entrance to room2 -->
+      <a-entity id="arrow2" geometry="primitive: cone; radiusBottom: 0.2; height: 0.5" material="color: yellow" position="1.5 0 -1.5" rotation="0 -45 0" visible="false"></a-entity>
 
       <!-- Camera -->
       <a-entity camera look-controls position="0 1.6 0"></a-entity>
     </a-scene>
+
+    <script>
+      // Get reference to the camera
+      var camera = document.querySelector('[camera]');
+
+      // Define waypoints
+      var entrance = document.querySelector('#entrance');
+      var room1 = document.querySelector('#room1');
+      var room2 = document.querySelector('#room2');
+
+      // Calculate distances from the entrance to rooms
+      var distanceToRoom1 = entrance.getAttribute('position').distanceTo(room1.getAttribute('position'));
+      var distanceToRoom2 = entrance.getAttribute('position').distanceTo(room2.getAttribute('position'));
+
+      // Show arrows based on distances
+      if (distanceToRoom1 < distanceToRoom2) {
+        // Show arrow from entrance to room1
+        document.querySelector('#arrow1').setAttribute('visible', 'true');
+      } else {
+        // Show arrow from entrance to room2
+        document.querySelector('#arrow2').setAttribute('visible', 'true');
+      }
+    </script>
   </body>
 </html>
