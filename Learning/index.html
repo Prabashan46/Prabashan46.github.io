@@ -1,42 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AR.js Example</title>
-  <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Cube Example</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-  <div style='position: fixed; top: 10px; width:100%; text-align: center; z-index: 1;'>
-    <button id="hideButton">HIDE OBJECTS</button>
-  </div>
+    <script src="https://threejs.org/build/three.min.js"></script>
+    <script>
+        // Create scene
+        var scene = new THREE.Scene();
 
-  <!-- Define your 3D scene and enable AR.js -->
-  <a-scene embedded arjs='trackingMethod: best;'>
+        // Create camera
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
 
-    <!-- Create an anchor to attach your augmented reality -->
-    <a-anchor hit-testing-enabled='true'>
+        // Create renderer
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-      <!-- Add your augmented reality objects here -->
-      <a-box position='0 0.5 0' material='opacity: 0.5; side: double; color: red;'>
-        <a-torus-knot radius='0.26' radius-tubular='0.05'>
-          <a-animation attribute="rotation" to="360 0 0" dur="5000" easing='linear' repeat="indefinite"></a-animation>
-        </a-torus-knot>
-      </a-box>
+        // Create cube geometry
+        var geometry = new THREE.BoxGeometry();
+        var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        var cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
 
-    </a-anchor>
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
 
-    <!-- Define a static camera -->
-    <a-camera-static></a-camera-static>
+            // Rotate the cube
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
 
-  </a-scene>
+            renderer.render(scene, camera);
+        }
 
-  <script>
-    // Add click event listener to the button
-    document.getElementById("hideButton").addEventListener("click", function(e) {
-      console.log("HIDE OBJECTS");
-      // Write code to hide objects here
-    });
-  </script>
+        animate();
+    </script>
 </body>
 </html>
