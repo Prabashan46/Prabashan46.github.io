@@ -1,25 +1,24 @@
 <!DOCTYPE html>
-<html>
-  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <!-- we import arjs version without NFT but with marker + location based support -->
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <body style="margin : 0px; overflow: hidden;">
-    <a-scene embedded arjs>
-      <a-marker preset="hiro">
-        <!-- we use cors proxy to avoid cross-origin problems -->
-        <!--
-          ⚠️⚠️⚠️
-          https://arjs-cors-proxy.herokuapp.com/ is now offline, Heroku has dismissed all his free plans from November 2022.
-          You need to host your own proxy and use it instead. The proxy is based on CORS Anywhere (see https://github.com/Rob--W/cors-anywhere).
-          ⚠️⚠️⚠️
-        -->
-        <a-entity
-          position="0 0 0"
-          scale="0.05 0.05 0.05"
-          gltf-model="https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
-        ></a-entity>
-      </a-marker>
-      <a-entity camera></a-entity>
-    </a-scene>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple AR Mall Navigation</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ar.js/3.2.1/aframe.min.js"></script>
+  <script src="script.js"></script> </head>
+</head>
+<body>
+  <a-scene>
+    <a-marker id="map-marker" src="hi.jpg">
+      <a-box width="2" height="1" depth="0.1" color="white"></a-box>
+    </a-marker>
+    <a-entity position="0 0.5 0">
+      <a-text value="Shop Name" color="black" click-event="showInfo">
+      </a-text>
+    </a-entity>
+    <a-entity id="info-panel" visible="false">
+      <a-text value="Shop Details..." color="black"></a-text>
+    </a-entity>
+  </a-scene>
+</body>
 </html>
