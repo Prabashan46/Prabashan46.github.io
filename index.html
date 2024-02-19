@@ -1,37 +1,17 @@
+<!doctype html>
 <html>
-
-	<head>
-		<script src="https://aframe.io/releases/1.0.3/aframe.min.js"></script>
-		<script src="https://raw.githack.com/jeromeetienne/AR.js/2.1.8/aframe/build/aframe-ar.js"></script>
-		<script src="https://unpkg.com/aframe-extras.animation-mixer@3.4.0/dist/aframe-extras.animation-mixer.js"></script>
-        <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/17.2.0/Tween.min.js"></script>
-        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-		<script src="https://unpkg.com/merge-images@1.2.0/dist/index.umd.js"></script>
-	</head>
-
-	<body style = 'margin: 0px; overflow: hidden;'>
-		<a-scene vr-mode-ui="enabled: false" embedded arjs='debugUIEnabled: false;'>
-
-			<a-assets>
-				<!-- 宣告欲生成的模型 -->
-				<a-asset-item id="gltf" src="https://raw.githubusercontent.com/HayaoGai/HayaoGai.github.io/master/model/OPA.gltf"></a-asset-item>
-			</a-assets>
-      
-			<!-- 偵測掃描圖 -->
-			<a-marker id="marker" type="hiro">
-				<!-- 掃描到就打開模型 -->
-				<a-gltf-model id="model" src="#gltf" rotation="-45 0 0" scale="3 3 3" animation-mixer></a-gltf-model>
-			</a-marker>
-         
-			<a-entity camera></a-entity>
-		</a-scene>
-
-		<script type="text/javascript" src="js/gesture.js"></script>
-		<script type="text/javascript" src="js/ar.js"></script>
-		<script type="text/javascript" src="js/camera.js"></script>
-		<script type="text/javascript" src="js/main.js"></script>
-
-	</body>
-
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' />
+    <meta charset='utf-8'>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <style></style>
+    <title>My Test First AR Project</title>
+    <script src="playcanvas-stable.min.js"></script>
+    <script src="__settings__.js"></script>
+</head>
+<body>
+    <script src="__start__.js"></script>
+    <script src="__loading__.js"></script>
+</body>
 </html>
