@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distance Tracking new</title>
+</head>
+<body>
+<div>
+    <label for="from">From:</label>
+    <select id="from">
+        <option value="Entrance">Entrance</option>
+        <option value="Room1">Room 1</option>
+        <option value="Room2">Room 2</option>
+        <option value="Room3">Room 3</option>
+    </select>
+    <label for="to">To:</label>
+    <select id="to">
+        <option value="Entrance">Entrance</option>
+        <option value="Room1">Room 1</option>
+        <option value="Room2">Room 2</option>
+        <option value="Room3">Room 3</option>
+    </select>
+    <br><br>
+    <button onclick="startNavigation()">Start Navigation</button>
+</div>
+<div id="instructions"></div>
+<div id="distanceWalked">Distance Walked: 0 meters</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var script = document.createElement("script");
+    script.src = "navigation.js";
+    document.body.appendChild(script);
+});
+</script>
+</body>
+</html>

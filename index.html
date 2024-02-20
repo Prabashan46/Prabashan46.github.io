@@ -3,35 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Distance Tracking new</title>
+<title>Mall Navigation</title>
 </head>
 <body>
+<h2>Select Starting and Destination Locations</h2>
 <div>
     <label for="from">From:</label>
     <select id="from">
-        <option value="Entrance">Entrance</option>
-        <option value="Room1">Room 1</option>
-        <option value="Room2">Room 2</option>
-        <option value="Room3">Room 3</option>
+        <option value="Entrance A">Entrance A</option>
+        <option value="Store 1">Store 1</option>
+        <option value="Store 2">Store 2</option>
+        <option value="Store 3">Store 3</option>
+        <option value="Store 4">Store 4</option>
+        <option value="Store 5">Store 5</option>
+        <option value="Store 6">Store 6</option>
+        <option value="Restroom">Restroom</option>
+        <option value="Escalator to Floor 2">Escalator to Floor 2</option>
+        <option value="Escalator to Ground Floor">Escalator to Ground Floor</option>
     </select>
     <label for="to">To:</label>
     <select id="to">
-        <option value="Entrance">Entrance</option>
-        <option value="Room1">Room 1</option>
-        <option value="Room2">Room 2</option>
-        <option value="Room3">Room 3</option>
+        <option value="Entrance A">Entrance A</option>
+        <option value="Store 1">Store 1</option>
+        <option value="Store 2">Store 2</option>
+        <option value="Store 3">Store 3</option>
+        <option value="Store 4">Store 4</option>
+        <option value="Store 5">Store 5</option>
+        <option value="Store 6">Store 6</option>
+        <option value="Restroom">Restroom</option>
+        <option value="Escalator to Floor 2">Escalator to Floor 2</option>
+        <option value="Escalator to Ground Floor">Escalator to Ground Floor</option>
     </select>
     <br><br>
-    <button onclick="startNavigation()">Start Navigation</button>
+    <button onclick="findOptimalPath()">Find Optimal Path</button>
 </div>
-<div id="instructions"></div>
-<div id="distanceWalked">Distance Walked: 0 meters</div>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var script = document.createElement("script");
-    script.src = "navigation.js";
-    document.body.appendChild(script);
-});
-</script>
+<div id="pathResult"></div>
+
+<script src="mall_navigation.js"></script>
+
 </body>
 </html>
