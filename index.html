@@ -3,28 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AR Navigation with Distance Tracking</title>
-<script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-<script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.8/aframe/build/aframe-ar.js"></script>
+<title>Indoor Navigation with Distance Tracking</title>
 </head>
 <body>
-<a-scene embedded arjs vr-mode-ui="enabled: false;">
-    <a-marker preset="hiro">
-        <!-- Define the virtual objects to be displayed on marker detection -->
-        <a-entity position="0 0 0">
-            <!-- Room 1 -->
-            <a-box color="blue" position="0 0.5 -1" width="0.5" height="1" depth="0.5"></a-box>
-            <!-- Room 2 -->
-            <a-box color="red" position="-1 0.5 0" width="0.5" height="1" depth="0.5"></a-box>
-            <!-- Room 3 -->
-            <a-box color="green" position="1 0.5 0" width="0.5" height="1" depth="0.5"></a-box>
-            <!-- Entrance -->
-            <a-box color="yellow" position="0 0.5 1" width="0.5" height="1" depth="0.5"></a-box>
-            <!-- Navigation instructions -->
-            <a-entity id="navigationText" position="0 1.5 0" text="value: Walk straight ahead;"></a-entity>
-        </a-entity>
-    </a-marker>
-</a-scene>
+<div>
+    <label for="from">From:</label>
+    <select id="from">
+        <option value="Entrance">Entrance</option>
+        <option value="Room1">Room 1</option>
+        <option value="Room2">Room 2</option>
+        <option value="Room3">Room 3</option>
+    </select>
+    <label for="to">To:</label>
+    <select id="to">
+        <option value="Entrance">Entrance</option>
+        <option value="Room1">Room 1</option>
+        <option value="Room2">Room 2</option>
+        <option value="Room3">Room 3</option>
+    </select>
+    <br><br>
+    <button onclick="startNavigation()">Start Navigation</button>
+</div>
+<div id="instructions"></div>
+<div id="distanceWalked">Distance Walked: 0 meters</div>
 
 <script>
     // Function to update navigation instructions based on selected locations
@@ -58,7 +59,7 @@
             instructions = "Exit Room 3 and turn right. Walk straight ahead. Room 2 will be on your right.";
         }
 
-        document.getElementById("navigationText").setAttribute("text", "value: " + instructions);
+        document.getElementById("instructions").innerText = instructions;
     }
 
     // Update navigation instructions when dropdown values change
