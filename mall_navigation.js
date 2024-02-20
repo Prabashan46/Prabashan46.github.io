@@ -71,7 +71,7 @@ const graph = {
       }
     }
     
-    return null;
+    return null; // No path found
   }
   
   // Example usage
