@@ -2,7 +2,6 @@
 function updateNavigationInstructions(from, to) {
     var instructions = "";
     var targetDistance = 2; // Target distance to walk in meters
-    var targetReached = false;
 
     // Update instructions based on selected locations
     if (from === "Entrance" && to === "Room1") {
@@ -14,6 +13,11 @@ function updateNavigationInstructions(from, to) {
     // Reset distance walked when navigation instructions change
     distanceWalked = 0;
     document.getElementById("distanceWalked").innerText = "Distance Walked: 0 meters";
+
+    // Reset turn verification flags
+    leftTurnDetected = false;
+    rightTurnDetected = false;
+    turnVerified = false;
 }
 
 // Update navigation instructions when dropdown values change
@@ -33,13 +37,16 @@ document.getElementById("to").addEventListener("change", function() {
 var distanceWalked = 0;
 var isWalking = false;
 var walkingThreshold = 1.0; // Adjust the threshold as needed
-var walkingStartTime = null;
 var lastAcceleration = { x: 0, y: 0, z: 0 };
-var turnVerified = false;
 
 // Initialize variables for gyroscope data
 var initialBeta = null;
 var turnThreshold = 45; // Adjust the threshold as needed
+
+// Initialize variables for turn detection and verification
+var leftTurnDetected = false;
+var rightTurnDetected = false;
+var turnVerified = false;
 
 // Track user's movements and update distance walked
 window.addEventListener("devicemotion", function(event) {
@@ -62,15 +69,21 @@ window.addEventListener("devicemotion", function(event) {
             }
 
             // Check if the user has turned left
-            if (initialBeta && !turnVerified && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
+            if (initialBeta && !leftTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
+                leftTurnDetected = true;
                 document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
-                turnVerified = true;
             }
 
             // Check if the user has walked the additional 2 meters after turning left
-            if (turnVerified && distanceWalked >= 4) {
-                document.getElementById("instructions").innerText = "You have reached your destination.";
-                isWalking = false; // Stop tracking distance
+            if (leftTurnDetected && distanceWalked >= 4 && !turnVerified) {
+                // Stop tracking distance until turn is verified
+                isWalking = false;
+                turnVerified = true;
+            }
+            
+            // Check if the user has turned right or not turned after the left turn instruction
+            if (leftTurnDetected && !turnVerified && Math.abs(event.rotationRate.beta - initialBeta) < turnThreshold) {
+                document.getElementById("instructions").innerText = "Turn left.";
             }
         }
 
@@ -81,7 +94,6 @@ window.addEventListener("devicemotion", function(event) {
 // Function to start navigation
 function startNavigation() {
     isWalking = true;
-    turnVerified = false; // Reset turn verification flag
     walkingStartTime = Date.now();
     var from = document.getElementById("from").value;
     var to = document.getElementById("to").value;
