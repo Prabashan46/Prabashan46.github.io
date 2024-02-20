@@ -45,7 +45,7 @@ var lastAcceleration = { x: 0, y: 0, z: 0 };
 
 // Initialize variables for gyroscope data
 var initialBeta = null;
-var turnThreshold = 45; // Adjust the threshold as needed
+var turnThreshold = 30; // Adjust the threshold as needed
 
 // Initialize variables for turn detection and verification
 var leftTurnDetected = false;
