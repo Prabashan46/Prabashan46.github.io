@@ -40,7 +40,7 @@ document.getElementById("to").addEventListener("change", function() {
 // Initialize variables for distance tracking
 var distanceWalked = 0;
 var isWalking = false;
-var walkingThreshold = 0.7; // Adjust the threshold as needed
+var walkingThreshold = 1.0; // Adjust the threshold as needed
 var lastAcceleration = { x: 0, y: 0, z: 0 };
 
 // Initialize variables for gyroscope data
@@ -67,7 +67,7 @@ window.addEventListener("devicemotion", function(event) {
             document.getElementById("instructions").innerText = "Turn left.";
         }
 
-        // Check if the user has turned left and the turn has been verified
+        // Check if the user has turned left
         if (initialBeta && !leftTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
             leftTurnDetected = true;
             document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
