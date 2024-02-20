@@ -18,6 +18,7 @@ function updateNavigationInstructions(from, to) {
     leftTurnDetected = false;
     rightTurnDetected = false;
     turnVerified = false;
+    initialBeta = null; // Reset initialBeta for accurate left turn detection
 }
 
 // Update navigation instructions when dropdown values change
@@ -57,13 +58,10 @@ window.addEventListener("devicemotion", function(event) {
                                  Math.abs(acceleration.y - lastAcceleration.y) +
                                  Math.abs(acceleration.z - lastAcceleration.z);
 
-        // Check if the user has turned left and the turn has been verified
-        if (leftTurnDetected && !rightTurnDetected && turnVerified) {
-            // Increment distance walked if acceleration exceeds threshold
-            if (deltaAcceleration >= walkingThreshold) {
-                distanceWalked += 0.01; // Incremental distance (adjust as needed)
-                document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
-            }
+        // Increment distance walked if acceleration exceeds threshold
+        if (deltaAcceleration >= walkingThreshold) {
+            distanceWalked += 0.01; // Incremental distance (adjust as needed)
+            document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
         }
 
         // Check if the user has walked the initial 2 meters
@@ -97,7 +95,7 @@ window.addEventListener("devicemotion", function(event) {
 
 // Function to start navigation
 function startNavigation() {
-    isWalking = true;
+    isWalking = true; // Set isWalking to true when navigation starts
     walkingStartTime = Date.now();
     var from = document.getElementById("from").value;
     var to = document.getElementById("to").value;
