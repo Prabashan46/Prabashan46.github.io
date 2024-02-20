@@ -18,7 +18,6 @@ function updateNavigationInstructions(from, to) {
     leftTurnDetected = false;
     rightTurnDetected = false;
     turnVerified = false;
-    initialBeta = null; // Reset initialBeta for accurate left turn detection
 }
 
 // Update navigation instructions when dropdown values change
@@ -37,17 +36,17 @@ document.getElementById("to").addEventListener("change", function() {
 // Initialize variables for distance tracking
 var distanceWalked = 0;
 var isWalking = false;
-var walkingThreshold = 1.0; // Adjust the threshold as needed
+var walkingThreshold = 0.7; // Adjust the threshold as needed
 var lastAcceleration = { x: 0, y: 0, z: 0 };
 
 // Initialize variables for gyroscope data
+var initialBeta = null;
 var turnThreshold = 45; // Adjust the threshold as needed
 
 // Initialize variables for turn detection and verification
 var leftTurnDetected = false;
 var rightTurnDetected = false;
 var turnVerified = false;
-var initialBeta = null; // Initialize initialBeta as null
 
 // Track user's movements and update distance walked
 window.addEventListener("devicemotion", function(event) {
@@ -65,15 +64,6 @@ window.addEventListener("devicemotion", function(event) {
         }
 
         // Check if the user has turned left and the turn has been verified
-        if (leftTurnDetected && !rightTurnDetected && turnVerified) {
-            // Increment distance walked if acceleration exceeds threshold
-            if (deltaAcceleration >= walkingThreshold) {
-                distanceWalked += 0.01; // Incremental distance (adjust as needed)
-                document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
-            }
-        }
-
-        // Check if the user has turned left
         if (initialBeta && !leftTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
             leftTurnDetected = true;
             document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
@@ -90,6 +80,12 @@ window.addEventListener("devicemotion", function(event) {
             // Stop tracking distance until turn is verified
             isWalking = false;
             turnVerified = true;
+        }
+
+        // Increment distance walked if acceleration exceeds threshold
+        if (deltaAcceleration >= walkingThreshold) {
+            distanceWalked += 0.01; // Incremental distance (adjust as needed)
+            document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
         }
 
         lastAcceleration = acceleration;
