@@ -26,6 +26,12 @@
 </div>
 <div id="instructions"></div>
 <div id="distanceWalked">Distance Walked: 0 meters</div>
-<script src="navigation.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var script = document.createElement("script");
+    script.src = "navigation.js";
+    document.body.appendChild(script);
+});
+</script>
 </body>
 </html>
