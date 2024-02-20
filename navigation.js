@@ -41,36 +41,33 @@ var leftTurnDetected = false;
 // Track user's movements and update distance walked
 window.addEventListener("devicemotion", function(event) {
     if (isWalking) {
-        // Calculate delta acceleration
-        var acceleration = event.acceleration;
-        var deltaAcceleration = Math.abs(acceleration.x - lastAcceleration.x) + 
-                                 Math.abs(acceleration.y - lastAcceleration.y) +
-                                 Math.abs(acceleration.z - lastAcceleration.z);
-
-        // Increment distance walked if acceleration exceeds threshold
-        if (deltaAcceleration >= walkingThreshold) {
-            distanceWalked += 0.01; // Incremental distance (adjust as needed)
-            document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
-        }
-
-        lastAcceleration = acceleration;
-
-        // Check if the user has walked the initial 2 meters
-        if (distanceWalked >= 2 && initialBeta === null) {
-            initialBeta = event.rotationRate.beta;
-            document.getElementById("instructions").innerText = "Turn left and walk straight for another 2 meters.";
-        }
-
         // Check if the user has turned left
         if (initialBeta !== null && !leftTurnDetected && event.rotationRate.beta <= initialBeta - orientationThreshold) {
             leftTurnDetected = true;
-            document.getElementById("instructions").innerText = "Walk straight for another 2 meters.";
+            document.getElementById("instructions").innerText = "Walk straight for another " + targetDistance + " meters.";
         }
 
-        // Check if the user has walked the additional 2 meters after turning left
-        if (leftTurnDetected && distanceWalked >= 4) {
-            document.getElementById("instructions").innerText = "You have reached your destination.";
-            isWalking = false; // Stop tracking distance
+        // Increment distance walked if left turn detected and acceleration exceeds threshold
+        if (leftTurnDetected) {
+            // Calculate delta acceleration
+            var acceleration = event.acceleration;
+            var deltaAcceleration = Math.abs(acceleration.x - lastAcceleration.x) + 
+                                     Math.abs(acceleration.y - lastAcceleration.y) +
+                                     Math.abs(acceleration.z - lastAcceleration.z);
+
+            // Increment distance walked if acceleration exceeds threshold
+            if (deltaAcceleration >= walkingThreshold) {
+                distanceWalked += 0.01; // Incremental distance (adjust as needed)
+                document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
+            }
+
+            lastAcceleration = acceleration;
+
+            // Check if the user has walked the additional 2 meters after turning left
+            if (leftTurnDetected && distanceWalked >= 2) {
+                document.getElementById("instructions").innerText = "You have reached your destination.";
+                isWalking = false; // Stop tracking distance
+            }
         }
     }
 });
