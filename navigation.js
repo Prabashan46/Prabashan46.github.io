@@ -37,6 +37,7 @@ var lastAcceleration = { x: 0, y: 0, z: 0 };
 var initialBeta = null; // Initial rotation rate around the beta axis
 var orientationThreshold = 20; // Adjust the threshold as needed
 var leftTurnDetected = false;
+var targetDistance = 2; // Target distance to walk in meters
 
 // Track user's movements and update distance walked
 window.addEventListener("devicemotion", function(event) {
@@ -64,7 +65,7 @@ window.addEventListener("devicemotion", function(event) {
             lastAcceleration = acceleration;
 
             // Check if the user has walked the additional 2 meters after turning left
-            if (leftTurnDetected && distanceWalked >= 2) {
+            if (leftTurnDetected && distanceWalked >= targetDistance) {
                 document.getElementById("instructions").innerText = "You have reached your destination.";
                 isWalking = false; // Stop tracking distance
             }
