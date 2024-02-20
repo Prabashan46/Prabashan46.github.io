@@ -89,12 +89,12 @@
 
             // Check if the user has walked the initial 2 meters
             if (distanceWalked >= 2 && !initialOrientation) {
-                initialOrientation = { alpha: event.rotationRate.alpha, beta: event.rotationRate.beta, gamma: event.rotationRate.gamma };
+                initialOrientation = event.rotationRate.beta;
                 document.getElementById("instructions").innerText = "Turn left and walk straight for another 2 meters.";
             }
 
             // Check if the user has turned left
-            if (initialOrientation && !leftTurnDetected && Math.abs(event.rotationRate.beta - initialOrientation.beta) >= orientationThreshold) {
+            if (initialOrientation && !leftTurnDetected && event.rotationRate.beta <= initialOrientation - orientationThreshold) {
                 leftTurnDetected = true;
                 document.getElementById("instructions").innerText = "Walk straight for another 2 meters.";
             }
