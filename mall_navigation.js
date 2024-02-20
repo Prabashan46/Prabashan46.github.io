@@ -1,14 +1,14 @@
 // Define the graph representing the first floor of the mall
 const graph = {
-    'Entrance A': { 'Store 1': 1, 'Store 6': 1 },
+    'Entrance A': { 'Store 1': 1, 'Store 6': 1, 'Escalator to Floor 2': 1 },
     'Store 1': { 'Entrance A': 1, 'Store 2': 1 },
     'Store 2': { 'Store 1': 1, 'Store 3': 1 },
     'Store 3': { 'Store 2': 1, 'Store 4': 1 },
     'Store 4': { 'Store 3': 1, 'Store 5': 1 },
     'Store 5': { 'Store 4': 1, 'Store 6': 1 },
-    'Store 6': { 'Store 5': 1, 'Restroom': 1, 'Escalator to Floor 2': 1, 'Escalator to Ground Floor': 1 },
+    'Store 6': { 'Store 5': 1, 'Restroom': 1, 'Entrance A': 1, 'Escalator to Ground Floor': 1 },
     'Restroom': { 'Store 6': 1 },
-    'Escalator to Floor 2': { 'Store 6': 1 },
+    'Escalator to Floor 2': { 'Entrance A': 1 },
     'Escalator to Ground Floor': { 'Store 6': 1 }
 };
 
@@ -48,8 +48,6 @@ function astar(start, goal) {
             }
             return path.reverse();
         }
-        
-        
 
         openSet.splice(currentIndex, 1);
 
@@ -72,6 +70,6 @@ function astar(start, goal) {
 
 // Example usage
 const startLocation = 'Entrance A';
-const goalLocation = 'Restroom';
+const goalLocation = 'Store 6';
 const optimalPath = astar(startLocation, goalLocation);
 console.log('Optimal Path:', optimalPath);
