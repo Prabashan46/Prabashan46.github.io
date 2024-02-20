@@ -3,19 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Navigation System</title>
+<title>Real-time Navigation System</title>
 <style>
     body {
         font-family: Arial, sans-serif;
         text-align: center;
     }
-    #container {
-        margin-top: 50px;
+    #map {
+        height: 400px;
+        width: 80%;
+        margin: 20px auto;
     }
 </style>
 </head>
 <body>
-<div id="container">
+<div>
     <label for="from">From:</label>
     <select id="from">
         <option value="Entrance">Entrance</option>
@@ -32,24 +34,43 @@
     </select>
     <br><br>
     <button onclick="startNavigation()">Start Navigation</button>
-    <div id="instructions"></div>
 </div>
+<div id="map"></div>
 
 <script>
+    var map;
+    var directionsService;
+    var directionsRenderer;
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: -34.397, lng: 150.644},
+            zoom: 15
+        });
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+    }
+
     function startNavigation() {
         var from = document.getElementById("from").value;
         var to = document.getElementById("to").value;
-        var distance = getDistance(from, to);
-        var instructions = document.getElementById("instructions");
-        instructions.innerHTML = "Walk straight " + distance + " meters.";
-    }
 
-    function getDistance(from, to) {
-        var locations = ["Entrance", "Room1", "Room2", "Room3"];
-        var fromIndex = locations.indexOf(from);
-        var toIndex = locations.indexOf(to);
-        return Math.abs(fromIndex - toIndex) * 2; // Assuming 2 meters per step
+        var request = {
+            origin: from,
+            destination: to,
+            travelMode: 'WALKING'
+        };
+
+        directionsService.route(request, function(result, status) {
+            if (status == 'OK') {
+                directionsRenderer.setDirections(result);
+            } else {
+                window.alert('Directions request failed due to ' + status);
+            }
+        });
     }
 </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtthCQzFLs2yQzxDxIFlHeiSH733dP8fs&callback=initMap" async defer></script>
 </body>
 </html>
