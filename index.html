@@ -3,79 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Indoor Navigation</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-    }
-    #instructions {
-        margin-top: 20px;
-    }
-</style>
+<title>AR Navigation with Distance Tracking</title>
+<script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+<script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.8/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
-<div>
-    <label for="from">From:</label>
-    <select id="from">
-        <option value="Entrance">Entrance</option>
-        <option value="Room1">Room 1</option>
-        <option value="Room2">Room 2</option>
-        <option value="Room3">Room 3</option>
-    </select>
-    <label for="to">To:</label>
-    <select id="to">
-        <option value="Entrance">Entrance</option>
-        <option value="Room1">Room 1</option>
-        <option value="Room2">Room 2</option>
-        <option value="Room3">Room 3</option>
-    </select>
-    <br><br>
-    <button onclick="startNavigation()">Start Navigation</button>
-</div>
-<div id="instructions"></div>
+<a-scene embedded arjs vr-mode-ui="enabled: false;">
+    <a-marker preset="hiro">
+        <!-- Define the virtual objects to be displayed on marker detection -->
+        <a-entity position="0 0 0">
+            <!-- Room 1 -->
+            <a-box color="blue" position="0 0.5 -1" width="0.5" height="1" depth="0.5"></a-box>
+            <!-- Room 2 -->
+            <a-box color="red" position="-1 0.5 0" width="0.5" height="1" depth="0.5"></a-box>
+            <!-- Room 3 -->
+            <a-box color="green" position="1 0.5 0" width="0.5" height="1" depth="0.5"></a-box>
+            <!-- Entrance -->
+            <a-box color="yellow" position="0 0.5 1" width="0.5" height="1" depth="0.5"></a-box>
+            <!-- Navigation instructions -->
+            <a-entity id="navigationText" position="0 1.5 0" text="value: Walk straight ahead;"></a-entity>
+        </a-entity>
+    </a-marker>
+</a-scene>
 
 <script>
-    function startNavigation() {
-        var from = document.getElementById("from").value;
+    // Function to update navigation instructions based on selected locations
+    function updateNavigationInstructions(from, to) {
+        var instructions = "Walk straight ahead";
+
+        // Update instructions based on selected locations (you can customize this logic)
+        if (from === "Entrance" && to === "Room1") {
+            instructions = "Walk straight ahead and turn right. Room 1 will be on your right.";
+        } else if (from === "Entrance" && to === "Room2") {
+            instructions = "Walk straight ahead and turn left. Room 2 will be on your left.";
+        } else if (from === "Entrance" && to === "Room3") {
+            instructions = "Walk straight ahead. Room 3 will be straight ahead.";
+        } else if (from === "Room1" && to === "Entrance") {
+            instructions = "Exit Room 1 and turn left. Walk straight ahead to reach the entrance.";
+        } else if (from === "Room1" && to === "Room2") {
+            instructions = "Exit Room 1 and turn right. Walk straight ahead to reach Room 2.";
+        } else if (from === "Room1" && to === "Room3") {
+            instructions = "Exit Room 1 and turn left. Walk straight ahead. Room 3 will be on your left.";
+        } else if (from === "Room2" && to === "Entrance") {
+            instructions = "Exit Room 2 and turn right. Walk straight ahead to reach the entrance.";
+        } else if (from === "Room2" && to === "Room1") {
+            instructions = "Exit Room 2 and turn left. Walk straight ahead to reach Room 1.";
+        } else if (from === "Room2" && to === "Room3") {
+            instructions = "Exit Room 2 and turn left. Walk straight ahead. Room 3 will be on your left.";
+        } else if (from === "Room3" && to === "Entrance") {
+            instructions = "Exit Room 3 and turn left. Walk straight ahead to reach the entrance.";
+        } else if (from === "Room3" && to === "Room1") {
+            instructions = "Exit Room 3 and turn right. Walk straight ahead. Room 1 will be on your right.";
+        } else if (from === "Room3" && to === "Room2") {
+            instructions = "Exit Room 3 and turn right. Walk straight ahead. Room 2 will be on your right.";
+        }
+
+        document.getElementById("navigationText").setAttribute("text", "value: " + instructions);
+    }
+
+    // Update navigation instructions when dropdown values change
+    document.getElementById("from").addEventListener("change", function() {
+        var from = this.value;
         var to = document.getElementById("to").value;
-        
-        var instructions = document.getElementById("instructions");
-        instructions.innerHTML = ""; // Clear previous instructions
+        updateNavigationInstructions(from, to);
+    });
 
-        // Define manual instructions based on selected locations
-        var manualInstructions = getManualInstructions(from, to);
-        instructions.innerHTML = manualInstructions;
-    }
+    document.getElementById("to").addEventListener("change", function() {
+        var from = document.getElementById("from").value;
+        var to = this.value;
+        updateNavigationInstructions(from, to);
+    });
 
-    function getManualInstructions(from, to) {
-        // Define manual instructions for different locations
-        var instructionsMap = {
-            "Entrance": {
-                "Room1": "Walk straight ahead and turn right. Room 1 will be on your right.",
-                "Room2": "Walk straight ahead and turn left. Room 2 will be on your left.",
-                "Room3": "Walk straight ahead. Room 3 will be straight ahead."
-            },
-            "Room1": {
-                "Entrance": "Exit Room 1 and turn left. Walk straight ahead to reach the entrance.",
-                "Room2": "Exit Room 1 and turn right. Walk straight ahead to reach Room 2.",
-                "Room3": "Exit Room 1 and turn left. Walk straight ahead. Room 3 will be on your left."
-            },
-            "Room2": {
-                "Entrance": "Exit Room 2 and turn right. Walk straight ahead to reach the entrance.",
-                "Room1": "Exit Room 2 and turn left. Walk straight ahead to reach Room 1.",
-                "Room3": "Exit Room 2 and turn left. Walk straight ahead. Room 3 will be on your left."
-            },
-            "Room3": {
-                "Entrance": "Exit Room 3 and turn left. Walk straight ahead to reach the entrance.",
-                "Room1": "Exit Room 3 and turn right. Walk straight ahead. Room 1 will be on your right.",
-                "Room2": "Exit Room 3 and turn right. Walk straight ahead. Room 2 will be on your right."
-            }
-        };
+    // Initialize variables for distance tracking
+    var startPosition = null;
+    var distanceWalked = 0;
 
-        // Get manual instructions based on selected locations
-        return instructionsMap[from][to];
-    }
+    // Track user's movements and update distance walked
+    window.addEventListener("devicemotion", function(event) {
+        if (!startPosition) {
+            startPosition = { x: event.acceleration.x, y: event.acceleration.y, z: event.acceleration.z };
+        } else {
+            var acceleration = event.acceleration;
+            var deltaX = acceleration.x - startPosition.x;
+            var deltaY = acceleration.y - startPosition.y;
+            var deltaZ = acceleration.z - startPosition.z;
+            var distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+            distanceWalked += distance;
+            startPosition = { x: acceleration.x, y: acceleration.y, z: acceleration.z };
+            document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
+        }
+    });
 </script>
 </body>
 </html>
