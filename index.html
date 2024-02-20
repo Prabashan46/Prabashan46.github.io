@@ -62,37 +62,28 @@
     // Initialize variables for distance tracking
     var startPosition = null;
     var distanceWalked = 0;
-    var lastTimestamp = null;
+    var isNavigationStarted = false;
 
     // Track user's movements and update distance walked
     window.addEventListener("devicemotion", function(event) {
-        var acceleration = event.acceleration;
-        var currentTime = new Date().getTime();
-        if (!startPosition) {
-            startPosition = { x: acceleration.x, y: acceleration.y, z: acceleration.z };
-            lastTimestamp = currentTime;
-        } else {
-            var deltaTime = currentTime - lastTimestamp;
-            var deltaX = acceleration.x - startPosition.x;
-            var deltaY = acceleration.y - startPosition.y;
-            var deltaZ = acceleration.z - startPosition.z;
-            var distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-            
-            // Check if user is walking (arbitrary threshold of 0.1 m/s^2 acceleration change)
-            if (deltaTime > 0 && distance > 0.1) {
-                // Assuming average walking speed of 1.4 m/s
-                var walkingSpeed = 1.4; // meters per second
-                var distanceWalkedIncrement = walkingSpeed * (deltaTime / 1000); // Incremental distance walked
-                distanceWalked += distanceWalkedIncrement;
-                startPosition = { x: acceleration.x, y: acceleration.y, z: acceleration.z };
-                lastTimestamp = currentTime;
+        if (isNavigationStarted) {
+            var acceleration = event.acceleration;
+            var deltaAcceleration = Math.abs(acceleration.x - lastAcceleration.x) + 
+                                     Math.abs(acceleration.y - lastAcceleration.y) +
+                                     Math.abs(acceleration.z - lastAcceleration.z);
+
+            if (deltaAcceleration > 0.2) { // Adjust this threshold as needed
+                distanceWalked += 0.01; // Incremental distance (adjust as needed)
                 document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
             }
+
+            lastAcceleration = acceleration;
         }
     });
 
     // Function to start navigation
     function startNavigation() {
+        isNavigationStarted = true;
         var from = document.getElementById("from").value;
         var to = document.getElementById("to").value;
         updateNavigationInstructions(from, to);
