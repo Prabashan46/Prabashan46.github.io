@@ -35,6 +35,7 @@ var isWalking = false;
 var walkingThreshold = 1.0; // Adjust the threshold as needed
 var walkingStartTime = null;
 var lastAcceleration = { x: 0, y: 0, z: 0 };
+var turnVerified = false;
 
 // Track user's movements and update distance walked
 window.addEventListener("devicemotion", function(event) {
@@ -49,6 +50,18 @@ window.addEventListener("devicemotion", function(event) {
         if (deltaAcceleration >= walkingThreshold) {
             distanceWalked += 0.01; // Incremental distance (adjust as needed)
             document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
+
+            // Check if the user has walked the initial 2 meters
+            if (distanceWalked >= 2 && !turnVerified) {
+                document.getElementById("instructions").innerText = "Turn left.";
+                turnVerified = true; // Set flag to indicate turn verification
+            }
+
+            // Check if the user has walked the additional 2 meters after turning left
+            if (distanceWalked >= 4) {
+                document.getElementById("instructions").innerText = "You have reached your destination.";
+                isWalking = false; // Stop tracking distance
+            }
         }
 
         lastAcceleration = acceleration;
@@ -58,6 +71,7 @@ window.addEventListener("devicemotion", function(event) {
 // Function to start navigation
 function startNavigation() {
     isWalking = true;
+    turnVerified = false; // Reset turn verification flag
     walkingStartTime = Date.now();
     var from = document.getElementById("from").value;
     var to = document.getElementById("to").value;

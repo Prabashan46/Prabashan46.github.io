@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Distance Tracking</title>
-<script src="navigation.js"></script> <!-- Script tag added here -->
 </head>
 <body>
 <div>
@@ -27,5 +26,12 @@
 </div>
 <div id="instructions"></div>
 <div id="distanceWalked">Distance Walked: 0 meters</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var script = document.createElement("script");
+    script.src = "navigation.js";
+    document.body.appendChild(script);
+});
+</script>
 </body>
 </html>
