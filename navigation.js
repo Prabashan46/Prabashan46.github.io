@@ -62,7 +62,7 @@ window.addEventListener("devicemotion", function(event) {
             }
 
             // Check if the user has turned left
-            if (initialBeta && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
+            if (initialBeta && !turnVerified && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
                 document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
                 turnVerified = true;
             }
