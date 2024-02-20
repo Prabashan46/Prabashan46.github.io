@@ -62,26 +62,31 @@
     // Initialize variables for distance tracking
     var startPosition = null;
     var distanceWalked = 0;
-    var targetDistance = 2; // Target distance to walk in meters
+    var lastTimestamp = null;
 
     // Track user's movements and update distance walked
     window.addEventListener("devicemotion", function(event) {
+        var acceleration = event.acceleration;
+        var currentTime = new Date().getTime();
         if (!startPosition) {
-            startPosition = { x: event.acceleration.x, y: event.acceleration.y, z: event.acceleration.z };
+            startPosition = { x: acceleration.x, y: acceleration.y, z: acceleration.z };
+            lastTimestamp = currentTime;
         } else {
-            var acceleration = event.acceleration;
+            var deltaTime = currentTime - lastTimestamp;
             var deltaX = acceleration.x - startPosition.x;
             var deltaY = acceleration.y - startPosition.y;
             var deltaZ = acceleration.z - startPosition.z;
             var distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-            distanceWalked += distance;
-            startPosition = { x: acceleration.x, y: acceleration.y, z: acceleration.z };
-            document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
-
-            // Check if target distance reached
-            if (distanceWalked >= targetDistance && !targetReached) {
-                document.getElementById("instructions").innerText = "Turn left and walk straight for another " + targetDistance + " meters.";
-                targetReached = true;
+            
+            // Check if user is walking (arbitrary threshold of 0.1 m/s^2 acceleration change)
+            if (deltaTime > 0 && distance > 0.1) {
+                // Assuming average walking speed of 1.4 m/s
+                var walkingSpeed = 1.4; // meters per second
+                var distanceWalkedIncrement = walkingSpeed * (deltaTime / 1000); // Incremental distance walked
+                distanceWalked += distanceWalkedIncrement;
+                startPosition = { x: acceleration.x, y: acceleration.y, z: acceleration.z };
+                lastTimestamp = currentTime;
+                document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
             }
         }
     });
