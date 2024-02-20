@@ -62,7 +62,7 @@
     // Initialize variables for distance tracking
     var distanceWalked = 0;
     var isWalking = false;
-    var walkingThreshold = 0.5; // Adjust the threshold as needed
+    var walkingThreshold = 2; // Adjust the threshold as needed (higher value to ignore small motions)
     var walkingStartTime = null;
     var lastAcceleration = { x: 0, y: 0, z: 0 };
     var initialOrientation = null;
