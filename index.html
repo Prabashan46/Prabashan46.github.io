@@ -36,11 +36,14 @@
     <button onclick="startNavigation()">Start Navigation</button>
 </div>
 <div id="map"></div>
+<div id="instructions"></div>
 
 <script>
     var map;
+    var distanceWalked = 0;
     var directionsService;
     var directionsRenderer;
+    var currentPosition;
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
@@ -65,12 +68,38 @@
         directionsService.route(request, function(result, status) {
             if (status == 'OK') {
                 directionsRenderer.setDirections(result);
+                trackDistance(result.routes[0].legs[0].steps);
             } else {
                 window.alert('Directions request failed due to ' + status);
             }
         });
     }
+
+    function trackDistance(steps) {
+        var stepIndex = 0;
+        var step = steps[stepIndex];
+        var path = step.path;
+        var previousPosition;
+
+        var intervalId = setInterval(function() {
+            if (!previousPosition) {
+                previousPosition = path[0];
+            } else {
+                var currentPosition = path.shift();
+                var distance = google.maps.geometry.spherical.computeDistanceBetween(previousPosition, currentPosition);
+                distanceWalked += distance;
+                previousPosition = currentPosition;
+
+                document.getElementById("instructions").innerHTML = "Walk straight. Distance walked: " + Math.round(distanceWalked) + " meters.";
+
+                if (distanceWalked >= 2) {
+                    clearInterval(intervalId);
+                    document.getElementById("instructions").innerHTML = "You have reached your destination!";
+                }
+            }
+        }, 1000); // Update every second
+    }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtthCQzFLs2yQzxDxIFlHeiSH733dP8fs&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&libraries=geometry" async defer></script>
 </body>
 </html>
