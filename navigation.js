@@ -85,8 +85,11 @@ window.addEventListener("devicemotion", function(event) {
 
         // Increment distance walked if acceleration exceeds threshold
         if (deltaAcceleration >= walkingThreshold) {
-            distanceWalked += 0.01; // Incremental distance (adjust as needed)
-            document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
+            // Ignore acceleration spikes that may indicate shakes
+            if (deltaAcceleration < 5 * walkingThreshold) {
+                distanceWalked += 0.01; // Incremental distance (adjust as needed)
+                document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
+            }
         }
 
         lastAcceleration = acceleration;
