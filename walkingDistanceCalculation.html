@@ -62,11 +62,9 @@
     // Initialize variables for distance tracking
     var distanceWalked = 0;
     var isWalking = false;
-    var walkingThreshold = 0.5; // Adjust the threshold as needed
+    var walkingThreshold = 1.0; // Adjust the threshold as needed
     var walkingStartTime = null;
     var lastAcceleration = { x: 0, y: 0, z: 0 };
-    var initialOrientation = null;
-    var orientationThreshold = 30; // Adjust the threshold as needed
 
     // Track user's movements and update distance walked
     window.addEventListener("devicemotion", function(event) {
@@ -84,17 +82,6 @@
             }
 
             lastAcceleration = acceleration;
-
-            // Check if the user has walked the initial 2 meters
-            if (distanceWalked >= 2 && !initialOrientation) {
-                initialOrientation = { alpha: event.rotationRate.alpha, beta: event.rotationRate.beta, gamma: event.rotationRate.gamma };
-                document.getElementById("instructions").innerText = "Turn left and walk straight for another 2 meters.";
-            }
-
-            // Check if the user has turned left
-            if (initialOrientation && Math.abs(event.rotationRate.beta - initialOrientation.beta) >= orientationThreshold) {
-                document.getElementById("instructions").innerText = "You have reached your destination.";
-            }
         }
     });
 
