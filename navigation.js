@@ -67,7 +67,7 @@ window.addEventListener("devicemotion", function(event) {
         }
 
         // Check if the user has walked the initial 2 meters
-        if (distanceWalked >= 2 && !initialBeta) {
+        if (!initialBeta && distanceWalked >= 2) {
             initialBeta = event.rotationRate.beta;
             document.getElementById("instructions").innerText = "Turn left.";
         }
