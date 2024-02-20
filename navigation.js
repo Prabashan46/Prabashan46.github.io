@@ -71,19 +71,16 @@ window.addEventListener("devicemotion", function(event) {
         }
 
         // Check if the user has turned left
-        if (initialBeta && !leftTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
-            leftTurnDetected = true;
-            document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
-        }
-
-        // Check if the user has turned right after the left turn instruction
-        if (leftTurnDetected && !rightTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) <= -turnThreshold) {
-            rightTurnDetected = true;
-            document.getElementById("instructions").innerText = "You have turned right. Please turn left.";
+        if (initialBeta && !leftTurnDetected) {
+            // Check if the current beta value has increased from the initial beta value by the turn threshold
+            if (event.rotationRate.beta >= initialBeta + turnThreshold) {
+                leftTurnDetected = true;
+                document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
+            }
         }
 
         // Check if the user has walked the additional 2 meters after turning left
-        if (leftTurnDetected && !rightTurnDetected && distanceWalked >= 4 && !turnVerified) {
+        if (leftTurnDetected && distanceWalked >= 4 && !turnVerified) {
             // Stop tracking distance until turn is verified
             isWalking = false;
             turnVerified = true;
@@ -92,6 +89,7 @@ window.addEventListener("devicemotion", function(event) {
         lastAcceleration = acceleration;
     }
 });
+
 
 // Function to start navigation
 function startNavigation() {
