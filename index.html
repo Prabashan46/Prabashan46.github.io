@@ -30,36 +30,20 @@
 <script>
     // Function to update navigation instructions based on selected locations
     function updateNavigationInstructions(from, to) {
-        var instructions = "Walk straight ahead";
+        var instructions = "";
+        var targetDistance = 2; // Target distance to walk in meters
+        var targetReached = false;
 
-        // Update instructions based on selected locations (you can customize this logic)
+        // Update instructions based on selected locations
         if (from === "Entrance" && to === "Room1") {
-            instructions = "Walk straight ahead and turn right. Room 1 will be on your right.";
-        } else if (from === "Entrance" && to === "Room2") {
-            instructions = "Walk straight ahead and turn left. Room 2 will be on your left.";
-        } else if (from === "Entrance" && to === "Room3") {
-            instructions = "Walk straight ahead. Room 3 will be straight ahead.";
-        } else if (from === "Room1" && to === "Entrance") {
-            instructions = "Exit Room 1 and turn left. Walk straight ahead to reach the entrance.";
-        } else if (from === "Room1" && to === "Room2") {
-            instructions = "Exit Room 1 and turn right. Walk straight ahead to reach Room 2.";
-        } else if (from === "Room1" && to === "Room3") {
-            instructions = "Exit Room 1 and turn left. Walk straight ahead. Room 3 will be on your left.";
-        } else if (from === "Room2" && to === "Entrance") {
-            instructions = "Exit Room 2 and turn right. Walk straight ahead to reach the entrance.";
-        } else if (from === "Room2" && to === "Room1") {
-            instructions = "Exit Room 2 and turn left. Walk straight ahead to reach Room 1.";
-        } else if (from === "Room2" && to === "Room3") {
-            instructions = "Exit Room 2 and turn left. Walk straight ahead. Room 3 will be on your left.";
-        } else if (from === "Room3" && to === "Entrance") {
-            instructions = "Exit Room 3 and turn left. Walk straight ahead to reach the entrance.";
-        } else if (from === "Room3" && to === "Room1") {
-            instructions = "Exit Room 3 and turn right. Walk straight ahead. Room 1 will be on your right.";
-        } else if (from === "Room3" && to === "Room2") {
-            instructions = "Exit Room 3 and turn right. Walk straight ahead. Room 2 will be on your right.";
+            instructions = "Walk straight ahead for " + targetDistance + " meters.";
         }
 
         document.getElementById("instructions").innerText = instructions;
+
+        // Reset distance walked when navigation instructions change
+        distanceWalked = 0;
+        document.getElementById("distanceWalked").innerText = "Distance Walked: 0 meters";
     }
 
     // Update navigation instructions when dropdown values change
@@ -78,6 +62,7 @@
     // Initialize variables for distance tracking
     var startPosition = null;
     var distanceWalked = 0;
+    var targetDistance = 2; // Target distance to walk in meters
 
     // Track user's movements and update distance walked
     window.addEventListener("devicemotion", function(event) {
@@ -92,8 +77,21 @@
             distanceWalked += distance;
             startPosition = { x: acceleration.x, y: acceleration.y, z: acceleration.z };
             document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
+
+            // Check if target distance reached
+            if (distanceWalked >= targetDistance && !targetReached) {
+                document.getElementById("instructions").innerText = "Turn left and walk straight for another " + targetDistance + " meters.";
+                targetReached = true;
+            }
         }
     });
+
+    // Function to start navigation
+    function startNavigation() {
+        var from = document.getElementById("from").value;
+        var to = document.getElementById("to").value;
+        updateNavigationInstructions(from, to);
+    }
 </script>
 </body>
 </html>
