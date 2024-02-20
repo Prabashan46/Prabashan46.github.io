@@ -62,12 +62,13 @@
     // Initialize variables for distance tracking
     var distanceWalked = 0;
     var isWalking = false;
-    var walkingThreshold = 1.5; // Adjust the threshold as needed (higher value to ignore small motions)
+    var walkingThreshold = 1.0; // Adjust the threshold as needed (higher value to ignore small motions)
     var walkingStartTime = null;
     var lastAcceleration = { x: 0, y: 0, z: 0 };
     var initialOrientation = null;
     var orientationThreshold = 30; // Adjust the threshold as needed
     var turnVerified = false;
+    var leftTurnDetected = false;
 
     // Track user's movements and update distance walked
     window.addEventListener("devicemotion", function(event) {
@@ -93,18 +94,13 @@
             }
 
             // Check if the user has turned left
-            if (initialOrientation && Math.abs(event.rotationRate.beta - initialOrientation.beta) >= orientationThreshold && !turnVerified) {
-                // Ask user to confirm left turn
-                if (confirm("Did you turn left?")) {
-                    turnVerified = true;
-                    document.getElementById("instructions").innerText = "Walk straight for another 2 meters.";
-                } else {
-                    alert("Please turn left and confirm.");
-                }
+            if (initialOrientation && !leftTurnDetected && Math.abs(event.rotationRate.beta - initialOrientation.beta) >= orientationThreshold) {
+                leftTurnDetected = true;
+                document.getElementById("instructions").innerText = "Walk straight for another 2 meters.";
             }
 
             // Check if the user has walked the additional 2 meters after turning left
-            if (turnVerified && distanceWalked >= 4) {
+            if (leftTurnDetected && distanceWalked >= 4) {
                 document.getElementById("instructions").innerText = "You have reached your destination.";
                 isWalking = false; // Stop tracking distance
             }
@@ -114,7 +110,7 @@
     // Function to start navigation
     function startNavigation() {
         isWalking = true;
-        turnVerified = false; // Reset turn verification
+        leftTurnDetected = false; // Reset left turn detection
         walkingStartTime = Date.now();
         var from = document.getElementById("from").value;
         var to = document.getElementById("to").value;
