@@ -14,6 +14,8 @@ function updateNavigationInstructions(from, to) {
     // Reset distance walked when navigation instructions change
     distanceWalked = 0;
     document.getElementById("distanceWalked").innerText = "Distance Walked: 0 meters";
+    // Reset turn verification flag
+    turnVerified = false;
 }
 
 // Update navigation instructions when dropdown values change
@@ -37,6 +39,10 @@ var walkingStartTime = null;
 var lastAcceleration = { x: 0, y: 0, z: 0 };
 var turnVerified = false;
 
+// Initialize variables for gyroscope data
+var initialOrientation = null;
+var orientationThreshold = 30; // Adjust the threshold as needed
+
 // Track user's movements and update distance walked
 window.addEventListener("devicemotion", function(event) {
     if (isWalking) {
@@ -52,13 +58,19 @@ window.addEventListener("devicemotion", function(event) {
             document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
 
             // Check if the user has walked the initial 2 meters
-            if (distanceWalked >= 2 && !turnVerified) {
+            if (distanceWalked >= 2 && !initialOrientation) {
+                initialOrientation = { alpha: event.rotationRate.alpha, beta: event.rotationRate.beta, gamma: event.rotationRate.gamma };
                 document.getElementById("instructions").innerText = "Turn left.";
-                turnVerified = true; // Set flag to indicate turn verification
+            }
+
+            // Check if the user has turned left and verify it
+            if (initialOrientation && Math.abs(event.rotationRate.beta - initialOrientation.beta) >= orientationThreshold && !turnVerified) {
+                document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
+                turnVerified = true;
             }
 
             // Check if the user has walked the additional 2 meters after turning left
-            if (distanceWalked >= 4) {
+            if (turnVerified && distanceWalked >= 4) {
                 document.getElementById("instructions").innerText = "You have reached your destination.";
                 isWalking = false; // Stop tracking distance
             }
