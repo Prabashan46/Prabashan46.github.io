@@ -18,6 +18,10 @@ function updateNavigationInstructions(from, to) {
     leftTurnDetected = false;
     rightTurnDetected = false;
     turnVerified = false;
+    initialBeta = null; // Reset initialBeta for accurate left turn detection
+
+    // Start tracking distance when navigation starts
+    isWalking = true;
 }
 
 // Update navigation instructions when dropdown values change
@@ -94,8 +98,6 @@ window.addEventListener("devicemotion", function(event) {
 
 // Function to start navigation
 function startNavigation() {
-    isWalking = true; // Set isWalking to true when navigation starts
-    walkingStartTime = Date.now();
     var from = document.getElementById("from").value;
     var to = document.getElementById("to").value;
     updateNavigationInstructions(from, to);
