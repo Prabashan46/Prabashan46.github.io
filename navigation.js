@@ -57,35 +57,38 @@ window.addEventListener("devicemotion", function(event) {
                                  Math.abs(acceleration.y - lastAcceleration.y) +
                                  Math.abs(acceleration.z - lastAcceleration.z);
 
-        // Increment distance walked if acceleration exceeds threshold
-        if (deltaAcceleration >= walkingThreshold) {
-            distanceWalked += 0.01; // Incremental distance (adjust as needed)
-            document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
-
-            // Check if the user has walked the initial 2 meters
-            if (distanceWalked >= 2 && !initialBeta) {
-                initialBeta = event.rotationRate.beta;
-                document.getElementById("instructions").innerText = "Turn left.";
+        // Check if the user has turned left and the turn has been verified
+        if (leftTurnDetected && !rightTurnDetected && turnVerified) {
+            // Increment distance walked if acceleration exceeds threshold
+            if (deltaAcceleration >= walkingThreshold) {
+                distanceWalked += 0.01; // Incremental distance (adjust as needed)
+                document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
             }
+        }
 
-            // Check if the user has turned left
-            if (initialBeta && !leftTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
-                leftTurnDetected = true;
-                document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
-            }
+        // Check if the user has walked the initial 2 meters
+        if (distanceWalked >= 2 && !initialBeta) {
+            initialBeta = event.rotationRate.beta;
+            document.getElementById("instructions").innerText = "Turn left.";
+        }
 
-            // Check if the user has turned right after the left turn instruction
-            if (leftTurnDetected && !rightTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) <= -turnThreshold) {
-                rightTurnDetected = true;
-                document.getElementById("instructions").innerText = "You have turned right. Please turn left.";
-            }
+        // Check if the user has turned left
+        if (initialBeta && !leftTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) >= turnThreshold) {
+            leftTurnDetected = true;
+            document.getElementById("instructions").innerText = "You have turned left. Walk straight for another 2 meters.";
+        }
 
-            // Check if the user has walked the additional 2 meters after turning left
-            if (leftTurnDetected && !rightTurnDetected && distanceWalked >= 4 && !turnVerified) {
-                // Stop tracking distance until turn is verified
-                isWalking = false;
-                turnVerified = true;
-            }
+        // Check if the user has turned right after the left turn instruction
+        if (leftTurnDetected && !rightTurnDetected && Math.abs(event.rotationRate.beta - initialBeta) <= -turnThreshold) {
+            rightTurnDetected = true;
+            document.getElementById("instructions").innerText = "You have turned right. Please turn left.";
+        }
+
+        // Check if the user has walked the additional 2 meters after turning left
+        if (leftTurnDetected && !rightTurnDetected && distanceWalked >= 4 && !turnVerified) {
+            // Stop tracking distance until turn is verified
+            isWalking = false;
+            turnVerified = true;
         }
 
         lastAcceleration = acceleration;
