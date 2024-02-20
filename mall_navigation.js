@@ -44,14 +44,11 @@ function astar(start, goal) {
             let path = [current];
             while (cameFrom[current]) {
                 current = cameFrom[current];
-                if (current in cameFrom) {
-                    path.push(current);
-                } else {
-                    break; // Exit the loop if current is not a valid key in cameFrom
-                }
+                path.push(current);
             }
             return path.reverse();
         }
+        
         
 
         openSet.splice(currentIndex, 1);
