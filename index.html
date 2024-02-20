@@ -62,26 +62,41 @@
     // Initialize variables for distance tracking
     var distanceWalked = 0;
     var isWalking = false;
+    var walkingThreshold = 0.5; // Adjust the threshold as needed
+    var walkingStartTime = null;
+    var initialOrientation = { alpha: 0, beta: 0, gamma: 0 };
+    var orientationThreshold = 10; // Adjust the threshold as needed
 
     // Track user's movements and update distance walked
     window.addEventListener("devicemotion", function(event) {
         var acceleration = event.acceleration;
         var deltaAcceleration = Math.abs(acceleration.x) + Math.abs(acceleration.y) + Math.abs(acceleration.z);
 
-        // Adjust the threshold as needed
-        var walkingThreshold = 0.5;
-
-        if (isWalking && deltaAcceleration < walkingThreshold) {
-            isWalking = false;
-        }
-
-        if (!isWalking && deltaAcceleration >= walkingThreshold) {
-            isWalking = true;
-        }
-
         if (isWalking) {
+            // If currently walking, increment distance walked
             distanceWalked += 0.01; // Incremental distance (adjust as needed)
             document.getElementById("distanceWalked").innerText = "Distance Walked: " + distanceWalked.toFixed(2) + " meters";
+        }
+
+        // Check if acceleration exceeds threshold to start or stop walking
+        if (deltaAcceleration >= walkingThreshold) {
+            if (!isWalking) {
+                // If not currently walking, start walking and record start time
+                isWalking = true;
+                walkingStartTime = Date.now();
+                initialOrientation.alpha = event.rotationRate.alpha;
+                initialOrientation.beta = event.rotationRate.beta;
+                initialOrientation.gamma = event.rotationRate.gamma;
+            }
+        } else {
+            if (isWalking) {
+                // If currently walking, check if walking duration exceeds 1 second
+                var walkingDuration = Date.now() - walkingStartTime;
+                if (walkingDuration >= 1000) {
+                    // If walking duration exceeds 1 second, stop walking
+                    isWalking = false;
+                }
+            }
         }
     });
 
@@ -91,6 +106,19 @@
         var to = document.getElementById("to").value;
         updateNavigationInstructions(from, to);
     }
+
+    // Check for changes in device orientation
+    window.addEventListener("deviceorientation", function(event) {
+        // Calculate difference in orientation from initial orientation
+        var deltaOrientation = Math.abs(event.alpha - initialOrientation.alpha) +
+                                Math.abs(event.beta - initialOrientation.beta) +
+                                Math.abs(event.gamma - initialOrientation.gamma);
+
+        // If the orientation has changed significantly, reset the walking state
+        if (deltaOrientation >= orientationThreshold) {
+            isWalking = false;
+        }
+    });
 </script>
 </body>
 </html>
