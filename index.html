@@ -3,16 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Real-time Navigation System</title>
+<title>Indoor Navigation</title>
 <style>
     body {
         font-family: Arial, sans-serif;
         text-align: center;
     }
-    #map {
-        height: 400px;
-        width: 80%;
-        margin: 20px auto;
+    #instructions {
+        margin-top: 20px;
     }
 </style>
 </head>
@@ -35,71 +33,49 @@
     <br><br>
     <button onclick="startNavigation()">Start Navigation</button>
 </div>
-<div id="map"></div>
 <div id="instructions"></div>
 
 <script>
-    var map;
-    var distanceWalked = 0;
-    var directionsService;
-    var directionsRenderer;
-    var currentPosition;
-
-    function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: -34.397, lng: 150.644},
-            zoom: 15
-        });
-        directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
-    }
-
     function startNavigation() {
         var from = document.getElementById("from").value;
         var to = document.getElementById("to").value;
+        
+        var instructions = document.getElementById("instructions");
+        instructions.innerHTML = ""; // Clear previous instructions
 
-        var request = {
-            origin: from,
-            destination: to,
-            travelMode: 'WALKING'
+        // Define manual instructions based on selected locations
+        var manualInstructions = getManualInstructions(from, to);
+        instructions.innerHTML = manualInstructions;
+    }
+
+    function getManualInstructions(from, to) {
+        // Define manual instructions for different locations
+        var instructionsMap = {
+            "Entrance": {
+                "Room1": "Walk straight ahead and turn right. Room 1 will be on your right.",
+                "Room2": "Walk straight ahead and turn left. Room 2 will be on your left.",
+                "Room3": "Walk straight ahead. Room 3 will be straight ahead."
+            },
+            "Room1": {
+                "Entrance": "Exit Room 1 and turn left. Walk straight ahead to reach the entrance.",
+                "Room2": "Exit Room 1 and turn right. Walk straight ahead to reach Room 2.",
+                "Room3": "Exit Room 1 and turn left. Walk straight ahead. Room 3 will be on your left."
+            },
+            "Room2": {
+                "Entrance": "Exit Room 2 and turn right. Walk straight ahead to reach the entrance.",
+                "Room1": "Exit Room 2 and turn left. Walk straight ahead to reach Room 1.",
+                "Room3": "Exit Room 2 and turn left. Walk straight ahead. Room 3 will be on your left."
+            },
+            "Room3": {
+                "Entrance": "Exit Room 3 and turn left. Walk straight ahead to reach the entrance.",
+                "Room1": "Exit Room 3 and turn right. Walk straight ahead. Room 1 will be on your right.",
+                "Room2": "Exit Room 3 and turn right. Walk straight ahead. Room 2 will be on your right."
+            }
         };
 
-        directionsService.route(request, function(result, status) {
-            if (status == 'OK') {
-                directionsRenderer.setDirections(result);
-                trackDistance(result.routes[0].legs[0].steps);
-            } else {
-                window.alert('Directions request failed due to ' + status);
-            }
-        });
-    }
-
-    function trackDistance(steps) {
-        var stepIndex = 0;
-        var step = steps[stepIndex];
-        var path = step.path;
-        var previousPosition;
-
-        var intervalId = setInterval(function() {
-            if (!previousPosition) {
-                previousPosition = path[0];
-            } else {
-                var currentPosition = path.shift();
-                var distance = google.maps.geometry.spherical.computeDistanceBetween(previousPosition, currentPosition);
-                distanceWalked += distance;
-                previousPosition = currentPosition;
-
-                document.getElementById("instructions").innerHTML = "Walk straight. Distance walked: " + Math.round(distanceWalked) + " meters.";
-
-                if (distanceWalked >= 2) {
-                    clearInterval(intervalId);
-                    document.getElementById("instructions").innerHTML = "You have reached your destination!";
-                }
-            }
-        }, 1000); // Update every second
+        // Get manual instructions based on selected locations
+        return instructionsMap[from][to];
     }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&libraries=geometry" async defer></script>
 </body>
 </html>
