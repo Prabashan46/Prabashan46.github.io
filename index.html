@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js txt creating</title>
+    <title>three.js create</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 <body>
 
 <div id="info">
-    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones<br/>(Chrome Android 81+)
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cubes<br/>(Chrome Android 81+)
 </div>
 
 <script type="module">
@@ -19,74 +19,45 @@
 
     let camera, scene, renderer;
     let controller;
-    let cones = []; // Array to store cone positions and rotations
-    let pressStartTime;
+    let cones = []; // Array to store cone positions
 
     init();
     animate();
 
     function init() {
 
-        const container = document.createElement('div');
-        document.body.appendChild(container);
+        const container = document.createElement( 'div' );
+        document.body.appendChild( container );
 
         scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 
-        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 3);
-        light.position.set(0.5, 1, 0.25);
-        scene.add(light);
+        const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 3 );
+        light.position.set( 0.5, 1, 0.25 );
+        scene.add( light );
 
         //
 
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.xr.enabled = true;
-        container.appendChild(renderer.domElement);
+        container.appendChild( renderer.domElement );
 
         //
 
-        document.body.appendChild(ARButton.createButton(renderer));
+        document.body.appendChild( ARButton.createButton( renderer ) );
 
         //
 
-        const geometry = new THREE.CylinderGeometry(0, 0.05, 0.2, 32).rotateX(Math.PI / 2);
-
-        function onSelectStart(event) {
-            pressStartTime = Date.now();
-        }
-
-        function onSelectEnd(event) {
-            const pressDuration = Date.now() - pressStartTime;
-            if (pressDuration >= 1000) {
-                // Long press detected, prompt to download cones data
-                saveConesToFile(cones);
-            }
-        }
-
-        function onSelect() {
-
-            const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.set(0, 0, -0.3).applyMatrix4(controller.matrixWorld);
-            mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
-            scene.add(mesh);
-
-            // Save cone position and rotation
-            cones.push({ position: mesh.position.clone(), rotation: mesh.quaternion.clone() });
-        }
-
-        controller = renderer.xr.getController(0);
-        controller.addEventListener('selectstart', onSelectStart);
-        controller.addEventListener('selectend', onSelectEnd);
-        controller.addEventListener('select', onSelect);
-        scene.add(controller);
+        controller = renderer.xr.getController( 0 );
+        controller.addEventListener( 'select', onControllerSelect );
+        scene.add( controller );
 
         //
 
-        window.addEventListener('resize', onWindowResize);
+        window.addEventListener( 'resize', onWindowResize );
 
     }
 
@@ -95,7 +66,7 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize( window.innerWidth, window.innerHeight );
 
     }
 
@@ -103,40 +74,44 @@
 
     function animate() {
 
-        renderer.setAnimationLoop(render);
+        renderer.setAnimationLoop( render );
 
     }
 
     function render() {
 
-        renderer.render(scene, camera);
+        renderer.render( scene, camera );
 
     }
 
-    // Function to save cones to a text file
-    async function saveConesToFile(cones) {
-        const text = JSON.stringify(cones, null, 2);
-        const blob = new Blob([text], { type: 'text/plain' });
-        const filename = 'cones.txt';
+    function onControllerSelect() {
 
-        if ('showSaveFilePicker' in window) {
-            try {
-                const handle = await window.showSaveFilePicker({ suggestedName: filename });
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-            } catch (err) {
-                console.error('Error saving cones:', err);
-            }
+        if (renderer.xr.isPresenting) {
+            cones.forEach(cone => {
+                const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                const material = new THREE.MeshNormalMaterial();
+                const cube = new THREE.Mesh(geometry, material);
+                cube.position.set(cone.x, cone.y, cone.z);
+                scene.add(cube);
+            });
         } else {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
+            console.error('AR session not active.');
         }
     }
+
+    // Function to fetch cone data from cones.txt
+    async function fetchConesData() {
+        try {
+            const response = await fetch('cones.txt');
+            const data = await response.json();
+            cones = data.map(cone => cone.position);
+        } catch (error) {
+            console.error('Error fetching cone data:', error);
+        }
+    }
+
+    // Fetch cone data when AR session starts
+    renderer.xr.addEventListener('sessionstart', fetchConesData);
 
 </script>
 </body>
