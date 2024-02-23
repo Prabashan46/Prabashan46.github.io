@@ -1,109 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js ar - cones</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<link type="text/css" rel="stylesheet" href="main.css">
-	</head>
-	<body>
+<head>
+    <title>three.js ar - cones with location tracking</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link type="text/css" rel="stylesheet" href="main.css">
+</head>
+<body>
 
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones<br/>(Chrome Android 81+)
-		</div>
+<div id="info">
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones<br/>(Chrome Android 81+)
+</div>
 
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
-				}
-			}
-		</script>
+<button id="startARButton" style="position: absolute; top: 20px; left: 20px;">Start AR</button>
 
-		<script type="module">
+<button id="stopButton" style="display: none; position: absolute; top: 20px; left: 20px;">Stop</button>
 
-			import * as THREE from 'three';
-			import { ARButton } from 'three/addons/webxr/ARButton.js';
+<script type="module">
 
-			let camera, scene, renderer;
-			let controller;
+    import * as THREE from 'https://threejs.org/build/three.module.js';
+    import { ARButton } from 'https://threejs.org/examples/jsm/webxr/ARButton.js';
 
-			init();
-			animate();
+    let camera, scene, renderer;
+    let controller;
+    let cones = []; // Array to store cone positions and rotations
+    let stopped = false;
 
-			function init() {
+    init();
+    animate();
 
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
+    function init() {
 
-				scene = new THREE.Scene();
+        const container = document.createElement( 'div' );
+        document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
+        scene = new THREE.Scene();
 
-				const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 3 );
-				light.position.set( 0.5, 1, 0.25 );
-				scene.add( light );
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 
-				//
+        const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 3 );
+        light.position.set( 0.5, 1, 0.25 );
+        scene.add( light );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.xr.enabled = true;
-				container.appendChild( renderer.domElement );
+        //
 
-				//
+        renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.xr.enabled = true;
+        container.appendChild( renderer.domElement );
 
-				document.body.appendChild( ARButton.createButton( renderer ) );
+        //
 
-				//
+        document.getElementById('startARButton').addEventListener('click', function() {
+            startAR();
+        });
 
-				const geometry = new THREE.CylinderGeometry( 0, 0.05, 0.2, 32 ).rotateX( Math.PI / 2 );
+        // Add event listener for stop button
+        document.getElementById('stopButton').addEventListener('click', function() {
+            stopped = true;
+            displayTracks();
+        });
 
-				function onSelect() {
+        //
 
-					const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.set( 0, 0, - 0.3 ).applyMatrix4( controller.matrixWorld );
-					mesh.quaternion.setFromRotationMatrix( controller.matrixWorld );
-					scene.add( mesh );
+        window.addEventListener( 'resize', onWindowResize );
 
-				}
+    }
 
-				controller = renderer.xr.getController( 0 );
-				controller.addEventListener( 'select', onSelect );
-				scene.add( controller );
+    function onWindowResize() {
 
-				//
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
 
-				window.addEventListener( 'resize', onWindowResize );
+        renderer.setSize( window.innerWidth, window.innerHeight );
 
-			}
+    }
 
-			function onWindowResize() {
+    //
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+    function animate() {
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setAnimationLoop( render );
 
-			}
+    }
 
-			//
+    function render() {
 
-			function animate() {
+        renderer.render( scene, camera );
 
-				renderer.setAnimationLoop( render );
+    }
 
-			}
+    function startAR() {
+        document.getElementById('startARButton').style.display = 'none'; // Hide start AR button
+        document.getElementById('stopButton').style.display = 'block'; // Show stop button
 
-			function render() {
+        renderer.xr.enabled = true;
+        document.body.appendChild( ARButton.createButton( renderer ) );
 
-				renderer.render( scene, camera );
+        const geometry = new THREE.CylinderGeometry( 0, 0.05, 0.2, 32 ).rotateX( Math.PI / 2 );
 
-			}
+        function onSelect() {
+            if (stopped) return; // Check if stopped
 
-		</script>
-	</body>
+            const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
+            const mesh = new THREE.Mesh( geometry, material );
+            mesh.position.set( 0, 0, - 0.3 ).applyMatrix4( controller.matrixWorld );
+            mesh.quaternion.setFromRotationMatrix( controller.matrixWorld );
+            scene.add( mesh );
+
+            // Save cone position and rotation
+            cones.push({ position: mesh.position.clone(), rotation: mesh.quaternion.clone() });
+        }
+
+        controller = renderer.xr.getController( 0 );
+        controller.addEventListener( 'select', onSelect );
+        scene.add( controller );
+    }
+
+    function displayTracks() {
+        console.log('Cones:', cones);
+        // Here you can display the tracks in any way you want
+    }
+
+</script>
+</body>
 </html>
