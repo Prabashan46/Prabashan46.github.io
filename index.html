@@ -18,7 +18,7 @@
 <body>
     <a-scene id="arScene" embedded arjs>
         <!-- Define AR content here -->
-        <a-box id="box" material="color: red;" position="0 0 -5" visible="false"></a-box>
+        <a-box id="box" material="color: red;" visible="false"></a-box>
         <a-entity camera></a-entity>
     </a-scene>
 
@@ -28,8 +28,21 @@
 
         // Add touchstart event listener to the document body
         document.body.addEventListener('touchstart', function(event) {
-            // Set the position of the box relative to the camera (in front of the camera)
-            box.setAttribute('position', '0 0 -5');
+            // Calculate the position of the box relative to the camera
+            var camera = document.querySelector('[camera]');
+            var cameraPos = camera.object3D.position.clone();
+            var cameraRotation = camera.object3D.rotation.clone();
+            var distance = -5; // Distance from the camera
+            var offsetX = 0; // X offset (centered)
+            var offsetY = 0; // Y offset (centered)
+
+            // Calculate the position of the box in 3D space
+            var dx = distance * Math.sin(cameraRotation.y);
+            var dy = distance * Math.sin(cameraRotation.x);
+            var dz = distance * Math.cos(cameraRotation.y) * Math.cos(cameraRotation.x);
+
+            // Set the position of the box relative to the camera
+            box.object3D.position.set(cameraPos.x + dx + offsetX, cameraPos.y + dy + offsetY, cameraPos.z + dz);
 
             // Show the box
             box.setAttribute('visible', 'true');
