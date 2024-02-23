@@ -18,7 +18,7 @@
 <body>
     <a-scene id="arScene" embedded arjs>
         <!-- Define AR content here -->
-        <a-marker preset="hiro">
+        <a-marker preset="hiro" makePersistent>
             <!-- Add content to display when marker is detected -->
             <a-box position="0 0.5 0" material="color: red;"></a-box>
         </a-marker>
