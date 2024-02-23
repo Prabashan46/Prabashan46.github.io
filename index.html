@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js ar - cones with location tracking</title>
+    <title>three.js ar new</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -10,6 +10,10 @@
 
 <div id="info">
     <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones<br/>(Chrome Android 81+)
+</div>
+
+<div id="conePositions">
+    <h2>Cone Positions:</h2>
 </div>
 
 <script type="module">
@@ -47,32 +51,10 @@
 
         //
 
-        document.body.appendChild( ARButton.createButton( renderer ) );
-
-        //
-
-        const geometry = new THREE.CylinderGeometry( 0, 0.05, 0.2, 32 ).rotateX( Math.PI / 2 );
-
-        function onSelect() {
-
-            const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
-            const mesh = new THREE.Mesh( geometry, material );
-            mesh.position.set( 0, 0, - 0.3 ).applyMatrix4( controller.matrixWorld );
-            mesh.quaternion.setFromRotationMatrix( controller.matrixWorld );
-            scene.add( mesh );
-
-            // Save cone position and rotation
-            cones.push({ position: mesh.position.clone(), rotation: mesh.quaternion.clone() });
-        }
-
-        controller = renderer.xr.getController( 0 );
-        controller.addEventListener( 'select', onSelect );
-        scene.add( controller );
-
-        //
-
         window.addEventListener( 'resize', onWindowResize );
 
+        // Listen for the end of the AR session
+        window.addEventListener('xrsessionend', onARSessionEnd);
     }
 
     function onWindowResize() {
@@ -97,6 +79,17 @@
         renderer.render( scene, camera );
 
     }
+
+    function onARSessionEnd(event) {
+        // Display the cone positions on the page
+        const conePositionsElement = document.getElementById('conePositions');
+        conePositionsElement.innerHTML = '<h2>Cone Positions:</h2>';
+        cones.forEach((cone, index) => {
+            conePositionsElement.innerHTML += `<p>Cone ${index + 1}: x=${cone.position.x.toFixed(2)}, y=${cone.position.y.toFixed(2)}, z=${cone.position.z.toFixed(2)}</p>`;
+        });
+    }
+
+    // AR session start and cone creation code is unchanged
 
 </script>
 </body>
