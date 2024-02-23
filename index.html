@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js ar - cones with location tracking</title>
+    <title>three.js ar cone add</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 <body>
 
 <div id="info">
-    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones<br/>(Chrome Android 81+)
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cubes<br/>(Chrome Android 81+)
 </div>
 
 <script type="module">
@@ -87,10 +87,13 @@
     function onControllerSelect() {
 
         if (renderer.xr.isPresenting) {
-            const material = new THREE.LineBasicMaterial({ color: 0xffff00 });
-            const geometry = new THREE.BufferGeometry().setFromPoints(cones.map(cone => new THREE.Vector3(cone.position.x, cone.position.y, cone.position.z)));
-            const line = new THREE.Line(geometry, material);
-            scene.add(line);
+            cones.forEach(cone => {
+                const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                const material = new THREE.MeshNormalMaterial();
+                const cube = new THREE.Mesh(geometry, material);
+                cube.position.set(cone.x, cone.y, cone.z);
+                scene.add(cube);
+            });
         } else {
             console.error('AR session not active.');
         }
