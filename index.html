@@ -1,88 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Path Drawing</title>
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-</head>
-<body>
-    <a-scene embedded arjs>
-        <!-- Define AR content here -->
-        <a-marker preset="hiro">
-            <!-- Add content to display when marker is detected -->
-            <a-entity id="path" line="start: 0 0 0; end: 0 0 0; color: red;"></a-entity>
-        </a-marker>
-        <a-entity camera></a-entity>
+	<head>
+		<title>three.js ar - cones</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
 
-        <!-- Script to handle touch events and draw path -->
-        <script>
-            // Get reference to the path entity
-            const path = document.querySelector('#path');
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones<br/>(Chrome Android 81+)
+		</div>
 
-            // Variables for path drawing
-            let isDrawing = false;
-            let pathPoints = [];
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
-            // Event listener for touch start
-            document.addEventListener('touchstart', onTouchStart);
+		<script type="module">
 
-            function onTouchStart(event) {
-                isDrawing = true;
-                pathPoints = [];
-                const touch = event.touches[0];
-                const x = touch.clientX;
-                const y = touch.clientY;
-                addPointToPath(x, y);
-            }
+			import * as THREE from 'three';
+			import { ARButton } from 'three/addons/webxr/ARButton.js';
 
-            // Event listener for touch move
-            document.addEventListener('touchmove', onTouchMove);
+			let camera, scene, renderer;
+			let controller;
 
-            function onTouchMove(event) {
-                if (isDrawing) {
-                    const touch = event.touches[0];
-                    const x = touch.clientX;
-                    const y = touch.clientY;
-                    addPointToPath(x, y);
-                }
-            }
+			init();
+			animate();
 
-            // Event listener for touch end
-            document.addEventListener('touchend', onTouchEnd);
+			function init() {
 
-            function onTouchEnd() {
-                isDrawing = false;
-            }
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
-            // Function to add a point to the path
-            function addPointToPath(x, y) {
-                // Convert screen coordinates to world coordinates
-                const worldPos = new THREE.Vector3();
-                const marker = document.querySelector('a-marker');
-                const canvas = document.querySelector('a-scene').renderer.domElement;
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-                const camera = document.querySelector('[camera]');
-                const cameraEl = camera.getObject3D('camera');
-                const pos = new THREE.Vector3(x / canvasWidth * 2 - 1, - (y / canvasHeight) * 2 + 1, 0.5);
-                pos.unproject(cameraEl);
-                pos.sub(cameraEl.position).normalize();
-                const distance = - cameraEl.position.z / pos.z;
-                worldPos.copy(cameraEl.position).add(pos.multiplyScalar(distance));
+				scene = new THREE.Scene();
 
-                // Add point to path
-                pathPoints.push(worldPos);
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 
-                // Update path visualization
-                path.setAttribute('line', {
-                    start: pathPoints[0].x + ' ' + pathPoints[0].y + ' ' + pathPoints[0].z,
-                    end: worldPos.x + ' ' + worldPos.y + ' ' + worldPos.z,
-                    color: 'red'
-                });
-            }
-        </script>
-    </a-scene>
-</body>
+				const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 3 );
+				light.position.set( 0.5, 1, 0.25 );
+				scene.add( light );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.xr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				//
+
+				document.body.appendChild( ARButton.createButton( renderer ) );
+
+				//
+
+				const geometry = new THREE.CylinderGeometry( 0, 0.05, 0.2, 32 ).rotateX( Math.PI / 2 );
+
+				function onSelect() {
+
+					const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
+					const mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( 0, 0, - 0.3 ).applyMatrix4( controller.matrixWorld );
+					mesh.quaternion.setFromRotationMatrix( controller.matrixWorld );
+					scene.add( mesh );
+
+				}
+
+				controller = renderer.xr.getController( 0 );
+				controller.addEventListener( 'select', onSelect );
+				scene.add( controller );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
 </html>
