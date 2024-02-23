@@ -18,7 +18,7 @@
 <body>
     <a-scene id="arScene" embedded arjs>
         <!-- Define AR content here -->
-        <a-box id="box" material="color: red;" visible="false" scale="0.2 0.2 0.2"></a-box>
+        <a-box id="box" material="color: red;" scale="0.2 0.2 0.2" animate__rotation="property: rotation; dur: 2000; easing: linear; loop: true;"></a-box>
         <a-entity camera fov="90"></a-entity>
     </a-scene>
 
@@ -26,15 +26,10 @@
         // Get reference to the box element
         var box = document.querySelector('#box');
 
-        // Listen for deviceorientation event
-        window.addEventListener('deviceorientation', function(event) {
-            // Rotate the box based on device orientation
-            var rotationX = event.beta; // rotation around the x-axis (front-to-back tilt)
-            var rotationY = event.gamma; // rotation around the y-axis (left-to-right tilt)
-            var rotationZ = event.alpha; // rotation around the z-axis (compass direction)
-
-            // Set rotation of the box
-            box.setAttribute('rotation', `${rotationX} ${rotationY} ${rotationZ}`);
+        // Add touchstart event listener to the document body
+        document.body.addEventListener('touchstart', function(event) {
+            // Show the box
+            box.setAttribute('visible', 'true');
         });
     </script>
 </body>
