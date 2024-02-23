@@ -63,9 +63,6 @@
 
             // Save cone position and rotation
             cones.push({ position: mesh.position.clone(), rotation: mesh.quaternion.clone() });
-
-            // Save cones to a text file
-            saveConesToFile(cones);
         }
 
         controller = renderer.xr.getController( 0 );
@@ -99,31 +96,6 @@
 
         renderer.render( scene, camera );
 
-    }
-
-    // Function to save cones to a text file
-    async function saveConesToFile(cones) {
-        const text = JSON.stringify(cones, null, 2);
-        const blob = new Blob([text], { type: 'text/plain' });
-        const filename = 'cones.txt';
-
-        if ('showSaveFilePicker' in window) {
-            try {
-                const handle = await window.showSaveFilePicker({ suggestedName: filename });
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-            } catch (err) {
-                console.error('Error saving cones:', err);
-            }
-        } else {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
     }
 
 </script>
