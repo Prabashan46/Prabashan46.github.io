@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js txt creating</title>
+    <title>three.js txt new</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -20,8 +20,8 @@
     let camera, scene, renderer;
     let controller;
     let cones = []; // Array to store cone positions and rotations
-    let locationName = 'A'; // Initial location name
     let pressStartTime;
+    let alphabetCounter = 65; // ASCII code for 'A'
 
     init();
     animate();
@@ -62,9 +62,14 @@
         function onSelectEnd(event) {
             const pressDuration = Date.now() - pressStartTime;
             if (pressDuration >= 1000) {
-                // Long press detected, prompt to download cones data
-                saveConesToFile(cones);
+                // Long press detected, add letter to cones
+                addLetterToCones();
             }
+        }
+
+        function onDoubleTap(event) {
+            // Download the cones file on triple tap
+            downloadConesFile();
         }
 
         function onSelect() {
@@ -75,17 +80,15 @@
             mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
             scene.add(mesh);
 
-            // Save cone position and rotation along with location name
-            cones.push({ location: locationName, position: mesh.position.clone(), rotation: mesh.quaternion.clone() });
-
-            // Increment location name
-            locationName = String.fromCharCode(locationName.charCodeAt(0) + 1);
+            // Save cone position and rotation
+            cones.push({ position: mesh.position.clone(), rotation: mesh.quaternion.clone() });
         }
 
         controller = renderer.xr.getController(0);
         controller.addEventListener('selectstart', onSelectStart);
         controller.addEventListener('selectend', onSelectEnd);
         controller.addEventListener('select', onSelect);
+        controller.addEventListener('doubleshow', onDoubleTap);
         scene.add(controller);
 
         //
@@ -117,29 +120,24 @@
 
     }
 
-    // Function to save cones to a text file
-    async function saveConesToFile(cones) {
+    // Function to add a letter to cones array
+    function addLetterToCones() {
+        const letter = String.fromCharCode(alphabetCounter++);
+        cones.push({ letter, position: controller.position.clone(), rotation: controller.quaternion.clone() });
+    }
+
+    // Function to download cones to a text file
+    function downloadConesFile() {
         const text = JSON.stringify(cones, null, 2);
         const blob = new Blob([text], { type: 'text/plain' });
         const filename = 'cones.txt';
 
-        if ('showSaveFilePicker' in window) {
-            try {
-                const handle = await window.showSaveFilePicker({ suggestedName: filename });
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-            } catch (err) {
-                console.error('Error saving cones:', err);
-            }
-        } else {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
 </script>
