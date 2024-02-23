@@ -26,26 +26,15 @@
         // Get reference to the box element
         var box = document.querySelector('#box');
 
-        // Add touchstart event listener to the document body
-        document.body.addEventListener('touchstart', function(event) {
-            // Calculate the position of the box relative to the camera
-            var camera = document.querySelector('[camera]');
-            var cameraPos = camera.object3D.position.clone();
-            var cameraRotation = camera.object3D.rotation.clone();
-            var distance = -5; // Distance from the camera
-            var offsetX = 0; // X offset (centered)
-            var offsetY = 0; // Y offset (centered)
+        // Listen for deviceorientation event
+        window.addEventListener('deviceorientation', function(event) {
+            // Rotate the box based on device orientation
+            var rotationX = event.beta; // rotation around the x-axis (front-to-back tilt)
+            var rotationY = event.gamma; // rotation around the y-axis (left-to-right tilt)
+            var rotationZ = event.alpha; // rotation around the z-axis (compass direction)
 
-            // Calculate the position of the box in 3D space
-            var dx = distance * Math.sin(cameraRotation.y);
-            var dy = distance * Math.sin(cameraRotation.x);
-            var dz = distance * Math.cos(cameraRotation.y) * Math.cos(cameraRotation.x);
-
-            // Set the position of the box relative to the camera
-            box.object3D.position.set(cameraPos.x + dx + offsetX, cameraPos.y + dy + offsetY, cameraPos.z + dz);
-
-            // Show the box
-            box.setAttribute('visible', 'true');
+            // Set rotation of the box
+            box.setAttribute('rotation', `${rotationX} ${rotationY} ${rotationZ}`);
         });
     </script>
 </body>
