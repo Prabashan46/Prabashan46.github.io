@@ -18,19 +18,17 @@
 <body>
     <a-scene id="arScene" embedded arjs>
         <!-- Define AR content here -->
-        <a-plane id="triggerPlane" width="10" height="10" position="0 0 -5" color="transparent"></a-plane>
         <a-box id="box" position="0 1.25 -3" material="color: red;" visible="false"></a-box>
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-        // Get references to the trigger plane and the box
-        var triggerPlane = document.querySelector('#triggerPlane');
+        // Get reference to the box element
         var box = document.querySelector('#box');
 
-        // Add touchstart event listener to the trigger plane
-        triggerPlane.addEventListener('touchstart', function(event) {
-            // Show the box when the trigger plane is touched
+        // Add touchstart event listener to the document body
+        document.body.addEventListener('touchstart', function(event) {
+            // Show the box when the screen is touched
             box.setAttribute('visible', 'true');
         });
     </script>
