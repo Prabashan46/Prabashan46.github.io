@@ -18,7 +18,7 @@
 <body>
     <a-scene id="arScene" embedded arjs>
         <!-- Define AR content here -->
-        <a-box id="box" position="0 1.25 -3" material="color: red;" visible="false"></a-box>
+        <a-box id="box" material="color: red;" visible="false"></a-box>
         <a-entity camera></a-entity>
     </a-scene>
 
@@ -28,7 +28,20 @@
 
         // Add touchstart event listener to the document body
         document.body.addEventListener('touchstart', function(event) {
-            // Show the box when the screen is touched
+            // Calculate the position of the touch relative to the center of the screen
+            var screenWidth = window.innerWidth;
+            var screenHeight = window.innerHeight;
+            var centerX = screenWidth / 2;
+            var centerY = screenHeight / 2;
+            var touchX = event.touches[0].clientX;
+            var touchY = event.touches[0].clientY;
+            var offsetX = touchX - centerX;
+            var offsetY = touchY - centerY;
+
+            // Set the position of the box to the calculated offset
+            box.setAttribute('position', `${offsetX / 100} ${-offsetY / 100} -5`);
+
+            // Show the box
             box.setAttribute('visible', 'true');
         });
     </script>
