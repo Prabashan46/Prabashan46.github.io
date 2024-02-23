@@ -9,8 +9,10 @@
 <body>
 
 <div id="info">
-    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones<br/>(Chrome Android 81+)
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones with location tracking<br/>(Chrome Android 81+)
 </div>
+
+<button id="stopButton" style="position: absolute; top: 20px; left: 20px;">Stop</button>
 
 <script type="module">
 
@@ -20,6 +22,7 @@
     let camera, scene, renderer;
     let controller;
     let cones = []; // Array to store cone positions and rotations
+    let stopped = false;
 
     init();
     animate();
@@ -54,6 +57,7 @@
         const geometry = new THREE.CylinderGeometry( 0, 0.05, 0.2, 32 ).rotateX( Math.PI / 2 );
 
         function onSelect() {
+            if (stopped) return; // Check if stopped
 
             const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
             const mesh = new THREE.Mesh( geometry, material );
@@ -72,6 +76,12 @@
         //
 
         window.addEventListener( 'resize', onWindowResize );
+
+        // Add event listener for stop button
+        document.getElementById('stopButton').addEventListener('click', function() {
+            stopped = true;
+            displayTracks();
+        });
 
     }
 
@@ -96,6 +106,11 @@
 
         renderer.render( scene, camera );
 
+    }
+
+    function displayTracks() {
+        console.log('Cones:', cones);
+        // Here you can display the tracks in any way you want
     }
 
 </script>
