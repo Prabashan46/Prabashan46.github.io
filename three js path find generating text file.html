@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js ar - cones with location tracking</title>
+    <title>three.js ar long</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -20,11 +20,12 @@
     let camera, scene, renderer;
     let controller;
     let cones = []; // Array to store cone positions and rotations
+    let pressStartTime;
 
     init();
     animate();
 
-    async function init() {
+    function init() {
 
         const container = document.createElement('div');
         document.body.appendChild(container);
@@ -53,31 +54,34 @@
 
         const geometry = new THREE.CylinderGeometry(0, 0.05, 0.2, 32).rotateX(Math.PI / 2);
 
-        async function fetchConesData() {
-            try {
-                const response = await fetch('cones.txt');
-                const data = await response.json();
-                cones = data.map(coneData => ({
-                    position: new THREE.Vector3().copy(coneData.position),
-                    rotation: new THREE.Quaternion().fromArray(coneData.rotation)
-                }));
-                drawPathLine();
-            } catch (error) {
-                console.error('Error fetching cones data:', error);
+        function onSelectStart(event) {
+            pressStartTime = Date.now();
+        }
+
+        function onSelectEnd(event) {
+            const pressDuration = Date.now() - pressStartTime;
+            if (pressDuration >= 1000) {
+                // Long press detected, prompt to download cones data
+                saveConesToFile(cones);
             }
         }
 
-        function drawPathLine() {
-            const pathPoints = cones.map(cone => new THREE.Vector3(cone.position.x, cone.position.y, cone.position.z));
-            const pathGeometry = new THREE.BufferGeometry().setFromPoints(pathPoints);
-            const pathMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-            const pathLine = new THREE.Line(pathGeometry, pathMaterial);
-            scene.add(pathLine);
+        function onSelect() {
+
+            const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(0, 0, -0.3).applyMatrix4(controller.matrixWorld);
+            mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
+            scene.add(mesh);
+
+            // Save cone position and rotation
+            cones.push({ position: mesh.position.clone(), rotation: mesh.quaternion.clone() });
         }
 
-        await fetchConesData();
-
         controller = renderer.xr.getController(0);
+        controller.addEventListener('selectstart', onSelectStart);
+        controller.addEventListener('selectend', onSelectEnd);
+        controller.addEventListener('select', onSelect);
         scene.add(controller);
 
         //
@@ -107,6 +111,31 @@
 
         renderer.render(scene, camera);
 
+    }
+
+    // Function to save cones to a text file
+    async function saveConesToFile(cones) {
+        const text = JSON.stringify(cones, null, 2);
+        const blob = new Blob([text], { type: 'text/plain' });
+        const filename = 'cones.txt';
+
+        if ('showSaveFilePicker' in window) {
+            try {
+                const handle = await window.showSaveFilePicker({ suggestedName: filename });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+            } catch (err) {
+                console.error('Error saving cones:', err);
+            }
+        } else {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
     }
 
 </script>
