@@ -1,52 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Web AR Example</title>
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
-        #arScene {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
-</head>
-<body>
-    <a-scene id="arScene" embedded arjs>
-        <!-- Define AR content here -->
-        <a-box id="box" material="color: red;" visible="false" scale="0.2 0.2 0.2"></a-box>
-        <a-entity camera fov="90"></a-entity>
-    </a-scene>
+<script>
+    // Get reference to the box element
+    var box = document.querySelector('#box');
 
-    <script>
-        // Get reference to the box element
-        var box = document.querySelector('#box');
+    // Variables to track touch start position and rotation
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var rotationX = 0;
+    var rotationY = 0;
 
-        // Add touchstart event listener to the document body
-        document.body.addEventListener('touchstart', function(event) {
-            // Calculate the position of the box relative to the camera
-            var camera = document.querySelector('[camera]');
-            var cameraPos = camera.object3D.position.clone();
-            var cameraRotation = camera.object3D.rotation.clone();
-            var distance = -5; // Distance from the camera
-            var offsetX = 0; // X offset (centered)
-            var offsetY = 0; // Y offset (centered)
+    // Add touchstart event listener to the document body
+    document.body.addEventListener('touchstart', function(event) {
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+        rotationX = box.object3D.rotation.x;
+        rotationY = box.object3D.rotation.y;
+    });
 
-            // Calculate the position of the box in 3D space
-            var dx = distance * Math.sin(cameraRotation.y);
-            var dy = distance * Math.sin(cameraRotation.x);
-            var dz = distance * Math.cos(cameraRotation.y) * Math.cos(cameraRotation.x);
+    // Add touchmove event listener to the document body
+    document.body.addEventListener('touchmove', function(event) {
+        // Calculate rotation based on touch movement
+        var deltaX = event.touches[0].clientX - touchStartX;
+        var deltaY = event.touches[0].clientY - touchStartY;
+        var sensitivity = 0.01; // Adjust sensitivity as needed
+        var newRotationX = rotationX + deltaX * sensitivity;
+        var newRotationY = rotationY + deltaY * sensitivity;
 
-            // Set the position of the box relative to the camera
-            box.object3D.position.set(cameraPos.x + dx + offsetX, cameraPos.y + dy + offsetY, cameraPos.z + dz);
+        // Apply rotation limits (optional)
+        // newRotationX = Math.max(Math.min(newRotationX, Math.PI / 2), -Math.PI / 2);
+        // newRotationY = Math.max(Math.min(newRotationY, Math.PI / 2), -Math.PI / 2);
 
-            // Show the box
-            box.setAttribute('visible', 'true');
-        });
-    </script>
-</body>
-</html>
+        // Set the rotation of the box
+        box.object3D.rotation.set(newRotationX, newRotationY, 0);
+    });
+</script>
