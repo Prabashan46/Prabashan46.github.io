@@ -1,99 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>json track</title>
+    <title>AR for iOS</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
 
 <div id="info">
-    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - Check cones<br/>(Chrome Android 81+)
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> AR ret
 </div>
 
 <script type="module">
 
     import * as THREE from 'https://threejs.org/build/three.module.js';
     import { ARButton } from 'https://threejs.org/examples/jsm/webxr/ARButton.js';
+    import { GLTFLoader } from 'https://threejs.org/examples/jsm/loaders/GLTFLoader.js';
 
     let camera, scene, renderer;
     let controller;
-    let cones = []; // Array to store cone positions and rotations
-    let pressStartTime;
-    let entranceCenter = new THREE.Vector3(); // Entrance center position
-    let fileIndex = 1; // File index counter
+    let cones = [];
+    let entranceCenter = new THREE.Vector3();
+    let fileIndex = 1;
 
     init();
     animate();
 
     function init() {
-
         const container = document.createElement('div');
         document.body.appendChild(container);
 
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+        scene.add(camera);
 
         const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 3);
         light.position.set(0.5, 1, 0.25);
         scene.add(light);
 
-        //
-
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.xr.enabled = true;
         container.appendChild(renderer.domElement);
-
-        //
 
         document.body.appendChild(ARButton.createButton(renderer));
 
-        //
-
-        const geometry = new THREE.CylinderGeometry(0, 0.05, 0.2, 32).rotateX(Math.PI / 2);
-
         function onSelectStart(event) {
-            pressStartTime = Date.now();
-            // Set entrance center position when cone adding starts
             entranceCenter.copy(controller.position);
         }
 
         function onSelectEnd(event) {
-            const pressDuration = Date.now() - pressStartTime;
-            if (pressDuration >= 1000) {
-                // Long press detected, prompt to download cones data
-                saveConesToFile(cones);
+            const coneCount = 5; // Number of cones to place in a row
+            const offset = 0.1; // Offset between cones
+            const startOffset = -0.2; // Offset from entranceCenter to start placing cones
+
+            const coneGeometry = new THREE.CylinderGeometry(0, 0.05, 0.2, 32).rotateX(Math.PI / 2);
+            const coneMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
+
+            for (let i = 0; i < coneCount; i++) {
+                const coneMesh = new THREE.Mesh(coneGeometry, coneMaterial);
+                const posX = entranceCenter.x + startOffset + (i * offset);
+                coneMesh.position.set(posX, entranceCenter.y, entranceCenter.z);
+                scene.add(coneMesh);
+                cones.push(coneMesh.position.clone());
             }
         }
 
         function onSelect() {
+            // Identify the center point of the rectangular area using cones positions
+            const centerPoint = calculateCenterPoint(cones);
 
-            const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
-            const mesh = new THREE.Mesh(geometry, material);
-            
-            // Calculate offset relative to entrance center
-            const offset = controller.position.clone().sub(entranceCenter);
-            mesh.position.set(0, 0, -0.3).applyMatrix4(controller.matrixWorld).add(offset);
-            
-            mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
-            scene.add(mesh);
+            // Use the center point to place cubes or perform other actions
+            placeCubeAt(centerPoint);
+        }
 
-            // Save cone position and rotation
-            cones.push({ 
-                position: {
-                    location: "",
-                    x: mesh.position.x,
-                    y: mesh.position.y,
-                    z: mesh.position.z
-                },
-                rotation: mesh.quaternion.toArray() 
-            });
+        function calculateCenterPoint(points) {
+            // Calculate the average position of the points
+            const center = new THREE.Vector3();
+            for (const point of points) {
+                center.add(point);
+            }
+            center.divideScalar(points.length);
+            return center;
+        }
 
-            fileIndex++; // Increment file index
+        function placeCubeAt(position) {
+            const cubeGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+            const cubeMaterial = new THREE.MeshNormalMaterial();
+            const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            cubeMesh.position.copy(position);
+            scene.add(cubeMesh);
         }
 
         controller = renderer.xr.getController(0);
@@ -102,58 +99,21 @@
         controller.addEventListener('select', onSelect);
         scene.add(controller);
 
-        //
-
         window.addEventListener('resize', onWindowResize);
-
     }
 
     function onWindowResize() {
-
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
-
         renderer.setSize(window.innerWidth, window.innerHeight);
-
     }
 
-    //
-
     function animate() {
-
         renderer.setAnimationLoop(render);
-
     }
 
     function render() {
-
         renderer.render(scene, camera);
-
-    }
-
-    // Function to save cones to a JSON file with a unique filename
-    async function saveConesToFile(cones) {
-        const text = JSON.stringify(cones, null, 2);
-        const filename = `${fileIndex}.json`; // Generate filename with file index
-        const blob = new Blob([text], { type: 'application/json' });
-
-        if ('showSaveFilePicker' in window) {
-            try {
-                const handle = await window.showSaveFilePicker({ suggestedName: filename });
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-            } catch (err) {
-                console.error('Error saving cones:', err);
-            }
-        } else {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
     }
 
 </script>
