@@ -67,30 +67,46 @@
             }
         }
 
-        function onSelect() {
-            const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
-            const mesh = new THREE.Mesh(geometry, material);
+        function onSelect(event) {
+    const touch = event.changedTouches[0]; // Get the touch event
+    const raycaster = new THREE.Raycaster();
+    const intersection = new THREE.Vector3();
 
-            const offset = controller.position.clone();
-            mesh.position.set(0, 0, -0.3).applyMatrix4(controller.matrixWorld).add(offset);
+    // Set up the raycaster from the touch position
+    raycaster.setFromCamera({ x: touch.clientX / window.innerWidth * 2 - 1, y: -(touch.clientY / window.innerHeight) * 2 + 1 }, camera);
 
-            mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
-            scene.add(mesh);
+    // Check for intersections with the detected plane
+    const intersects = raycaster.intersectObjects(scene.children.filter(obj => obj.isMesh && obj.userData.plane)); // Filter out only plane objects
+    if (intersects.length > 0) {
+        intersection.copy(intersects[0].point);
+    } else {
+        // If no plane is detected, fall back to the controller position
+        intersection.copy(controller.position);
+    }
 
-            // Store cone position, rotation, and plane detection data
-            cones.push({ 
-                position: {
-                    x: mesh.position.x,
-                    y: mesh.position.y,
-                    z: mesh.position.z,
-                    referencePoint: controller.position.toArray() // Save the initial reference point
-                },
-                rotation: mesh.quaternion.toArray(),
-                planeDetection: controller.planeDetectionState // Store plane detection data
-            });
+    const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
+    const mesh = new THREE.Mesh(geometry, material);
+    
+    mesh.position.copy(intersection); // Set the cone position at the intersection point
+    
+    mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
+    scene.add(mesh);
 
-            fileIndex++; // Increment file index
-        }
+    // Store cone position, rotation, and plane detection data
+    cones.push({ 
+        position: {
+            x: mesh.position.x,
+            y: mesh.position.y,
+            z: mesh.position.z,
+            referencePoint: controller.position.toArray() // Save the initial reference point
+        },
+        rotation: mesh.quaternion.toArray(),
+        planeDetection: controller.planeDetectionState // Store plane detection data
+    });
+
+    fileIndex++; // Increment file index
+}
+
 
         controller = renderer.xr.getController(0);
         controller.addEventListener('selectstart', onSelectStart);
