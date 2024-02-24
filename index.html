@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>json plane</title>
+    <title>json la</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -68,50 +68,49 @@
         }
 
         function onSelect(event) {
-    const touch = event.changedTouches[0]; // Get the touch event
-    const raycaster = new THREE.Raycaster();
-    const intersection = new THREE.Vector3();
+            const touch = event.changedTouches[0]; // Get the touch event
+            const raycaster = new THREE.Raycaster();
+            const intersection = new THREE.Vector3();
 
-    // Set up the raycaster from the touch position
-    raycaster.setFromCamera({ x: touch.clientX / window.innerWidth * 2 - 1, y: -(touch.clientY / window.innerHeight) * 2 + 1 }, camera);
+            // Set up the raycaster from the touch position
+            raycaster.setFromCamera({ x: touch.clientX / window.innerWidth * 2 - 1, y: -(touch.clientY / window.innerHeight) * 2 + 1 }, camera);
 
-    // Check for intersections with the detected plane
-    const intersects = raycaster.intersectObjects(scene.children.filter(obj => obj.isMesh && obj.userData.plane)); // Filter out only plane objects
-    if (intersects.length > 0) {
-        intersection.copy(intersects[0].point);
-    } else {
-        // If no plane is detected, fall back to the controller position
-        intersection.copy(controller.position);
-    }
+            // Check for intersections with the detected plane
+            const intersects = raycaster.intersectObjects(scene.children.filter(obj => obj.isMesh && obj.userData.plane)); // Filter out only plane objects
+            if (intersects.length > 0) {
+                intersection.copy(intersects[0].point);
+            } else {
+                // If no plane is detected, fall back to the controller position
+                intersection.copy(controller.position);
+            }
 
-    const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
-    const mesh = new THREE.Mesh(geometry, material);
-    
-    mesh.position.copy(intersection); // Set the cone position at the intersection point
-    
-    mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
-    scene.add(mesh);
+            const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
+            const mesh = new THREE.Mesh(geometry, material);
 
-    // Store cone position, rotation, and plane detection data
-    cones.push({ 
-        position: {
-            x: mesh.position.x,
-            y: mesh.position.y,
-            z: mesh.position.z,
-            referencePoint: controller.position.toArray() // Save the initial reference point
-        },
-        rotation: mesh.quaternion.toArray(),
-        planeDetection: controller.planeDetectionState // Store plane detection data
-    });
+            mesh.position.copy(intersection); // Set the cone position at the intersection point
 
-    fileIndex++; // Increment file index
-}
+            mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
+            scene.add(mesh);
 
+            // Store cone position, rotation, and plane detection data
+            cones.push({
+                position: {
+                    x: mesh.position.x,
+                    y: mesh.position.y,
+                    z: mesh.position.z,
+                    referencePoint: controller.position.toArray() // Save the initial reference point
+                },
+                rotation: mesh.quaternion.toArray(),
+                planeDetection: controller.planeDetectionState // Store plane detection data
+            });
+
+            fileIndex++; // Increment file index
+        }
 
         controller = renderer.xr.getController(0);
         controller.addEventListener('selectstart', onSelectStart);
         controller.addEventListener('selectend', onSelectEnd);
-        controller.addEventListener('select', onSelect);
+        controller.addEventListener('touchstart', onSelect); // Listen for touch events to add cones
         scene.add(controller);
 
         //
