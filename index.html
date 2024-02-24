@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>gen txt  new</title>
+    <title>json create</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -128,10 +128,10 @@
 
     }
 
-    // Function to generate a random string
-    function generateRandomString(length) {
+    // Function to generate an alphabetic string
+    function generateAlphabeticString(length) {
         let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         for (let i = 0; i < length; i++) {
             result += characters.charAt(Math.floor(Math.random() * characters.length));
         }
@@ -141,7 +141,7 @@
     // Function to save cones to a JSON file with a unique filename
     async function saveConesToFile(cones) {
         const text = JSON.stringify(cones, null, 2);
-        const filename = `cones_${generateRandomString(5)}.json`; // Generate a unique filename
+        const filename = `${generateAlphabeticString(1)}.json`; // Generate a unique alphabetic filename
         const blob = new Blob([text], { type: 'application/json' });
 
         if ('showSaveFilePicker' in window) {
