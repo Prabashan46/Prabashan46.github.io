@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Positioning</title>
+    <title>json plane</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
+
+<div id="info">
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - cones<br/>(Chrome Android 81+)
+</div>
 
 <script type="module">
 
@@ -14,7 +19,9 @@
 
     let camera, scene, renderer;
     let controller;
-    let cones = []; // Array to store cone positions relative to controller
+    let cones = []; // Array to store cone positions, rotations, and plane detection data
+    let pressStartTime;
+    let fileIndex = 1; // File index counter
 
     init();
     animate();
@@ -46,8 +53,49 @@
 
         //
 
+        const geometry = new THREE.CylinderGeometry(0, 0.05, 0.2, 32).rotateX(Math.PI / 2);
+
+        function onSelectStart(event) {
+            pressStartTime = Date.now();
+        }
+
+        function onSelectEnd(event) {
+            const pressDuration = Date.now() - pressStartTime;
+            if (pressDuration >= 1000) {
+                // Long press detected, prompt to download cones data
+                saveConesToFile(cones);
+            }
+        }
+
+        function onSelect() {
+            const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
+            const mesh = new THREE.Mesh(geometry, material);
+
+            const offset = controller.position.clone();
+            mesh.position.set(0, 0, -0.3).applyMatrix4(controller.matrixWorld).add(offset);
+
+            mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
+            scene.add(mesh);
+
+            // Store cone position, rotation, and plane detection data
+            cones.push({ 
+                position: {
+                    x: mesh.position.x,
+                    y: mesh.position.y,
+                    z: mesh.position.z,
+                    referencePoint: controller.position.toArray() // Save the initial reference point
+                },
+                rotation: mesh.quaternion.toArray(),
+                planeDetection: controller.planeDetectionState // Store plane detection data
+            });
+
+            fileIndex++; // Increment file index
+        }
+
         controller = renderer.xr.getController(0);
-        controller.addEventListener('select', onControllerSelect);
+        controller.addEventListener('selectstart', onSelectStart);
+        controller.addEventListener('selectend', onSelectEnd);
+        controller.addEventListener('select', onSelect);
         scene.add(controller);
 
         //
@@ -79,42 +127,30 @@
 
     }
 
-    function onControllerSelect() {
+    // Function to save cones to a JSON file with a unique filename
+    async function saveConesToFile(cones) {
+        const text = JSON.stringify(cones, null, 2);
+        const filename = `${fileIndex}.json`; // Generate filename with file index
+        const blob = new Blob([text], { type: 'application/json' });
 
-        if (renderer.xr.isPresenting) {
-            cones.forEach(cone => {
-                const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-                const material = new THREE.MeshNormalMaterial();
-                const cube = new THREE.Mesh(geometry, material);
-                
-                // Set cube position relative to controller using stored relative positions
-                cube.position.copy(controller.position).add(cone.relativePosition);
-                cube.quaternion.copy(controller.quaternion);
-                
-                scene.add(cube);
-            });
+        if ('showSaveFilePicker' in window) {
+            try {
+                const handle = await window.showSaveFilePicker({ suggestedName: filename });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+            } catch (err) {
+                console.error('Error saving cones:', err);
+            }
         } else {
-            console.error('AR session not active.');
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
         }
     }
-
-    // Function to fetch cone data from cones.json
-    async function fetchConesData() {
-        try {
-            const response = await fetch('unique_data.json');
-            const data = await response.json();
-            cones = data.map(cone => {
-                // Calculate relative position of cone to controller
-                cone.relativePosition = new THREE.Vector3(cone.position.x, cone.position.y, cone.position.z);
-                return cone;
-            });
-        } catch (error) {
-            console.error('Error fetching cone data:', error);
-        }
-    }
-
-    // Fetch cone data when AR session starts
-    renderer.xr.addEventListener('sessionstart', fetchConesData);
 
 </script>
 </body>
