@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Generate points</title>
+    <title>generate ab</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
@@ -15,7 +15,7 @@
     let camera, scene, renderer;
     let controller;
     let cones = []; // Array to store cone positions
-    let touchCount = 0; // Variable to count the number of touches
+    let referencePoint; // Reference point for cone placement
 
     init();
     animate();
@@ -55,6 +55,9 @@
 
         window.addEventListener('resize', onWindowResize);
 
+        // Set reference point when AR session starts
+        renderer.xr.addEventListener('sessionstart', setReferencePoint);
+
     }
 
     function onWindowResize() {
@@ -81,64 +84,42 @@
     }
 
     function onControllerSelect() {
+
         if (renderer.xr.isPresenting) {
-            // Increment touch count
-            touchCount++;
-
-            // Place a cone
-            const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-            const material = new THREE.MeshNormalMaterial();
-            const cone = new THREE.Mesh(geometry, material);
-
-            // Set position based on controller position
-            cone.position.copy(controller.position);
-
-            scene.add(cone);
-            cones.push(cone.position.toArray()); // Store cone position
-
-            // If two cones have been placed, add a cube
-            if (touchCount === 2) {
-                // Identify rectangular area and get center point
-                const boundingBox = new THREE.Box3().setFromPoints(cones.map(pos => new THREE.Vector3().fromArray(pos)));
-                const center = new THREE.Vector3();
-                boundingBox.getCenter(center);
-
-                // Load cube at the center point
-                const cubeGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-                const cubeMaterial = new THREE.MeshNormalMaterial();
-                const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-                cube.position.copy(center);
+            cones.forEach(cone => {
+                const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                const material = new THREE.MeshNormalMaterial();
+                const cube = new THREE.Mesh(geometry, material);
+                
+                // Calculate cube position relative to reference point
+                const position = new THREE.Vector3().fromArray(cone.position).sub(referencePoint);
+                cube.position.copy(position);
+                
                 scene.add(cube);
-
-                // Save cube position to JSON file
-                saveCubePosition(cube.position);
-            }
+            });
         } else {
             console.error('AR session not active.');
         }
     }
 
-    // Function to save cube position to a JSON file
-    function saveCubePosition(position) {
-        const data = {
-            position: {
-                x: position.x,
-                y: position.y,
-                z: position.z
-            }
-        };
-
-        const text = JSON.stringify(data, null, 2);
-        const filename = 'cube_position.json';
-
-        const blob = new Blob([text], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
+    // Set the reference point for cube placement
+    function setReferencePoint(event) {
+        referencePoint = controller.position.clone();
     }
+
+    // Function to fetch cone data from cones.json
+    async function fetchConesData() {
+        try {
+            const response = await fetch('unique_data.json'); // Change from 'cones.txt' to 'cones.json'
+            const data = await response.json();
+            cones = data.map(cone => cone.position); // Store cone positions only
+        } catch (error) {
+            console.error('Error fetching cone data:', error);
+        }
+    }
+
+    // Fetch cone data when AR session starts
+    renderer.xr.addEventListener('sessionstart', fetchConesData);
 
 </script>
 </body>
