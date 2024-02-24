@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>json refer</title>
+    <title>json refer scn</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -75,7 +75,7 @@
             const mesh = new THREE.Mesh(geometry, material);
             
             const offset = controller.position.clone().sub(referencePoint);
-            mesh.position.copy(offset); // Set the cone position relative to the reference point
+            mesh.position.copy(referencePoint).add(offset); // Set the cone position relative to the reference point
             
             mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
             scene.add(mesh);
@@ -86,7 +86,7 @@
                     x: offset.x,
                     y: offset.y,
                     z: offset.z,
-                    referencePoint: [0, 0, 0] // Reference point is always [0, 0, 0] relative to itself
+                    referencePoint: referencePoint.toArray() // Save the reference point
                 },
                 rotation: mesh.quaternion.toArray() 
             });
