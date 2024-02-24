@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>generate ab</title>
+    <title>generate abc</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
@@ -15,6 +15,7 @@
     let camera, scene, renderer;
     let controller;
     let cones = []; // Array to store cone positions
+    let referencePoint; // Reference point for cone placement
 
     init();
     animate();
@@ -54,6 +55,9 @@
 
         window.addEventListener('resize', onWindowResize);
 
+        // Set reference point when AR session starts
+        renderer.xr.addEventListener('sessionstart', setReferencePoint);
+
     }
 
     function onWindowResize() {
@@ -87,8 +91,9 @@
                 const material = new THREE.MeshNormalMaterial();
                 const cube = new THREE.Mesh(geometry, material);
                 
-                // Set cube position at the absolute reference point
-                cube.position.set(cone.position.referencePoint[0], cone.position.referencePoint[1], cone.position.referencePoint[2]);
+                // Calculate cube position relative to reference point
+                const position = new THREE.Vector3().fromArray(cone.position).sub(referencePoint);
+                cube.position.copy(position);
                 
                 scene.add(cube);
             });
@@ -97,12 +102,17 @@
         }
     }
 
+    // Set the reference point for cube placement
+    function setReferencePoint(event) {
+        referencePoint = controller.position.clone();
+    }
+
     // Function to fetch cone data from cones.json
     async function fetchConesData() {
         try {
             const response = await fetch('unique_data.json'); // Change from 'cones.txt' to 'cones.json'
             const data = await response.json();
-            cones = data.map(cone => cone); // Changed to cone => cone
+            cones = data.map(cone => cone.position); // Store cone positions only
         } catch (error) {
             console.error('Error fetching cone data:', error);
         }
