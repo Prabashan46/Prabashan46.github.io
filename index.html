@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js create news</title>
+    <title>three.js render change</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
    <!-- <link type="text/css" rel="stylesheet" href="main.css"> -->
@@ -88,7 +88,7 @@
 
         if (renderer.xr.isPresenting) {
             cones.forEach(cone => {
-                const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                const geometry = new THREE.BoxGeometry(getCubeSize(), getCubeSize(), getCubeSize());
                 const material = new THREE.MeshNormalMaterial();
                 const cube = new THREE.Mesh(geometry, material);
                 cube.position.set(cone.x, cone.y, cone.z);
@@ -112,6 +112,13 @@
 
     // Fetch cone data when AR session starts
     renderer.xr.addEventListener('sessionstart', fetchConesData);
+
+    // Function to calculate cube size dynamically based on scene size
+    function getCubeSize() {
+        const sceneSize = Math.min(scene.position.x, scene.position.y, scene.position.z);
+        // Adjust this value based on your preference and testing
+        return sceneSize * 0.1; // You can adjust the multiplier as needed
+    }
 
 </script>
 </body>
