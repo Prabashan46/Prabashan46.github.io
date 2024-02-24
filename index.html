@@ -10,21 +10,21 @@
 <div id="dropdownContainer">
     <label for="fromDropdown">From:</label>
     <select id="fromDropdown">
-        <option value="entrance">Entrance</option>
-        <option value="kitchen">Kitchen</option>
-        <option value="room1">Room 1</option>
-        <option value="sammyRoom">Sammy Room</option>
-        <option value="restRoom">Rest Room</option>
-        <option value="room2">Room 2</option>
+        <option value="Entrance">Entrance</option>
+        <option value="Kitchen">Kitchen</option>
+        <option value="Room1">Room 1</option>
+        <option value="Sammyroom">Sammy Room</option>
+        <option value="Restroom">Rest Room</option>
+        <option value="Room2">Room 2</option>
     </select>
     <label for="toDropdown">To:</label>
     <select id="toDropdown">
-        <option value="entrance">Entrance</option>
-        <option value="kitchen">Kitchen</option>
-        <option value="room1">Room 1</option>
-        <option value="sammyRoom">Sammy Room</option>
-        <option value="restRoom">Rest Room</option>
-        <option value="room2">Room 2</option>
+        <option value="Entrance">Entrance</option>
+        <option value="Kitchen">Kitchen</option>
+        <option value="Room1">Room 1</option>
+        <option value="Sammyroom">Sammy Room</option>
+        <option value="Restroom">Rest Room</option>
+        <option value="Room2">Room 2</option>
     </select>
 </div>
 
@@ -36,6 +36,43 @@
     let camera, scene, renderer;
     let controller;
     let cones = []; // Array to store cone positions
+    let pathData = {
+    "entrance": [
+        "kitchen",
+        "room1",
+        "sammyRoom",
+        "kitchen",
+        "room1",
+        "sammyRoom"
+    ],
+    "kitchen": [
+        "entrance",
+        "room1",
+        "sammyRoom",
+        "room1",
+        "sammyRoom"
+    ],
+    "room1": [
+        "entrance",
+        "kitchen",
+        "sammyRoom",
+        "restRoom",
+        "sammyRoom",
+        "restRoom"
+    ],
+    "sammyRoom": [
+        "entrance",
+        "kitchen",
+        "room1",
+        "restRoom",
+        "restRoom"
+    ],
+    "restRoom": [
+        "room1",
+        "sammyRoom"
+    ],
+    "room2": []
+}; // Object to store path data
 
     init();
     animate();
@@ -103,7 +140,18 @@
     function onControllerSelect() {
 
         if (renderer.xr.isPresenting) {
-            cones.forEach(cone => {
+            const fromDropdown = document.getElementById('fromDropdown').value;
+            const toDropdown = document.getElementById('toDropdown').value;
+            if (fromDropdown === toDropdown) {
+                console.error('From and to locations cannot be the same.');
+                return;
+            }
+            const path = getPath(fromDropdown, toDropdown);
+            if (!path) {
+                console.error('No path found between the selected locations.');
+                return;
+            }
+            path.forEach(cone => {
                 const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
                 const material = new THREE.MeshNormalMaterial();
                 const cube = new THREE.Mesh(geometry, material);
@@ -120,10 +168,41 @@
         try {
             const response = await fetch('cones.txt');
             const data = await response.json();
-            cones = data.map(cone => cone); // Changed to cone => cone
+            cones = data.map(cone => cone);
+            pathData = generatePathData(); // Call to generate path data
         } catch (error) {
             console.error('Error fetching cone data:', error);
         }
+    }
+
+    // Function to generate path data
+    function generatePathData() {
+        const pathData = {};
+        cones.forEach(cone => {
+            if (!pathData[cone.from]) {
+                pathData[cone.from] = [];
+            }
+            pathData[cone.from].push(cone);
+        });
+        return pathData;
+    }
+
+    // Function to get path between two locations
+    function getPath(from, to) {
+        const path = [];
+        let currentLocation = from;
+        while (currentLocation !== to) {
+            if (!pathData[currentLocation]) {
+                return null;
+            }
+            const nextLocation = pathData[currentLocation].find(cone => cone.to === to);
+            if (!nextLocation) {
+                return null;
+            }
+            path.push(nextLocation);
+            currentLocation = nextLocation.to;
+        }
+        return path;
     }
 
     // Fetch cone data when AR session starts
