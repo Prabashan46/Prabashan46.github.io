@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js re</title>
+    <title>create</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
@@ -99,7 +99,7 @@
         try {
             const response = await fetch('cones.txt');
             const data = await response.json();
-            cones = data.map(cone => cone.position);
+            cones = data.map(cone => cone); // Changed to cone => cone
         } catch (error) {
             console.error('Error fetching cone data:', error);
         }
