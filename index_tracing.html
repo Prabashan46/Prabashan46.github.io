@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Generate points</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+</head>
+<body>
+
+<script type="module">
+
+    import * as THREE from 'https://threejs.org/build/three.module.js';
+    import { ARButton } from 'https://threejs.org/examples/jsm/webxr/ARButton.js';
+
+    let camera, scene, renderer;
+    let controller;
+    let cones = []; // Array to store cone positions
+    let touchCount = 0; // Variable to count the number of touches
+
+    init();
+    animate();
+
+    function init() {
+
+        const container = document.createElement('div');
+        document.body.appendChild(container);
+
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+
+        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 3);
+        light.position.set(0.5, 1, 0.25);
+        scene.add(light);
+
+        //
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        //
+
+        document.body.appendChild(ARButton.createButton(renderer));
+
+        //
+
+        controller = renderer.xr.getController(0);
+        controller.addEventListener('select', onControllerSelect);
+        scene.add(controller);
+
+        //
+
+        window.addEventListener('resize', onWindowResize);
+
+    }
+
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+    }
+
+    //
+
+    function animate() {
+
+        renderer.setAnimationLoop(render);
+
+    }
+
+    function render() {
+
+        renderer.render(scene, camera);
+
+    }
+
+    function onControllerSelect() {
+        if (renderer.xr.isPresenting) {
+            // Increment touch count
+            touchCount++;
+
+            // Place a cone
+            const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+            const material = new THREE.MeshNormalMaterial();
+            const cone = new THREE.Mesh(geometry, material);
+
+            // Set position based on controller position
+            cone.position.copy(controller.position);
+
+            scene.add(cone);
+            cones.push(cone.position.toArray()); // Store cone position
+
+            // If two cones have been placed, add a cube
+            if (touchCount === 2) {
+                // Identify rectangular area and get center point
+                const boundingBox = new THREE.Box3().setFromPoints(cones.map(pos => new THREE.Vector3().fromArray(pos)));
+                const center = new THREE.Vector3();
+                boundingBox.getCenter(center);
+
+                // Load cube at the center point
+                const cubeGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                const cubeMaterial = new THREE.MeshNormalMaterial();
+                const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                cube.position.copy(center);
+                scene.add(cube);
+
+                // Save cube position to JSON file
+                saveCubePosition(cube.position);
+            }
+        } else {
+            console.error('AR session not active.');
+        }
+    }
+
+    // Function to save cube position to a JSON file
+    function saveCubePosition(position) {
+        const data = {
+            position: {
+                x: position.x,
+                y: position.y,
+                z: position.z
+            }
+        };
+
+        const text = JSON.stringify(data, null, 2);
+        const filename = 'cube_position.json';
+
+        const blob = new Blob([text], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+</script>
+</body>
+</html>
