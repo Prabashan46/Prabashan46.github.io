@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>json la</title>
+    <title>json plane ref</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -19,8 +19,8 @@
 
     let camera, scene, renderer;
     let controller;
-    let cones = []; // Array to store cone positions, rotations, and plane detection data
-    let pressStartTime;
+    let cones = []; // Array to store cone positions and rotations
+    let referencePoint; // Reference point for cone placement
     let fileIndex = 1; // File index counter
 
     init();
@@ -56,7 +56,7 @@
         const geometry = new THREE.CylinderGeometry(0, 0.05, 0.2, 32).rotateX(Math.PI / 2);
 
         function onSelectStart(event) {
-            pressStartTime = Date.now();
+            referencePoint = controller.position.clone(); // Set the reference point
         }
 
         function onSelectEnd(event) {
@@ -68,40 +68,25 @@
         }
 
         function onSelect(event) {
-            const touch = event.changedTouches[0]; // Get the touch event
-            const raycaster = new THREE.Raycaster();
-            const intersection = new THREE.Vector3();
-
-            // Set up the raycaster from the touch position
-            raycaster.setFromCamera({ x: touch.clientX / window.innerWidth * 2 - 1, y: -(touch.clientY / window.innerHeight) * 2 + 1 }, camera);
-
-            // Check for intersections with the detected plane
-            const intersects = raycaster.intersectObjects(scene.children.filter(obj => obj.isMesh && obj.userData.plane)); // Filter out only plane objects
-            if (intersects.length > 0) {
-                intersection.copy(intersects[0].point);
-            } else {
-                // If no plane is detected, fall back to the controller position
-                intersection.copy(controller.position);
-            }
-
+            if (!referencePoint) return; // Make sure we have a reference point
             const material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random() });
             const mesh = new THREE.Mesh(geometry, material);
 
-            mesh.position.copy(intersection); // Set the cone position at the intersection point
+            const offset = controller.position.clone().sub(referencePoint);
+            mesh.position.copy(referencePoint).add(offset);
 
             mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
             scene.add(mesh);
 
-            // Store cone position, rotation, and plane detection data
-            cones.push({
+            // Store cone position and rotation relative to the reference point
+            cones.push({ 
                 position: {
                     x: mesh.position.x,
                     y: mesh.position.y,
                     z: mesh.position.z,
-                    referencePoint: controller.position.toArray() // Save the initial reference point
+                    referencePoint: referencePoint.toArray() // Save the reference point
                 },
-                rotation: mesh.quaternion.toArray(),
-                planeDetection: controller.planeDetectionState // Store plane detection data
+                rotation: mesh.quaternion.toArray() 
             });
 
             fileIndex++; // Increment file index
@@ -110,7 +95,7 @@
         controller = renderer.xr.getController(0);
         controller.addEventListener('selectstart', onSelectStart);
         controller.addEventListener('selectend', onSelectEnd);
-        controller.addEventListener('touchstart', onSelect); // Listen for touch events to add cones
+        controller.addEventListener('select', onSelect);
         scene.add(controller);
 
         //
