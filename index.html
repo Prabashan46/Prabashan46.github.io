@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Positioning</title>
+    <title>Generate nee</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
@@ -14,7 +14,7 @@
 
     let camera, scene, renderer;
     let controller;
-    let cones = []; // Array to store cone positions relative to controller
+    let cones = []; // Array to store cone positions relative to initial controller position
 
     init();
     animate();
@@ -87,8 +87,8 @@
                 const material = new THREE.MeshNormalMaterial();
                 const cube = new THREE.Mesh(geometry, material);
                 
-                // Set cube position relative to controller using stored relative positions
-                cube.position.copy(controller.position).add(cone.relativePosition);
+                // Set cube position relative to initial controller position using stored relative positions
+                cube.position.copy(cone.relativePosition);
                 cube.quaternion.copy(controller.quaternion);
                 
                 scene.add(cube);
@@ -104,7 +104,7 @@
             const response = await fetch('unique_data.json');
             const data = await response.json();
             cones = data.map(cone => {
-                // Calculate relative position of cone to controller
+                // Calculate relative position of cone to initial controller position
                 cone.relativePosition = new THREE.Vector3(cone.position.x, cone.position.y, cone.position.z);
                 return cone;
             });
