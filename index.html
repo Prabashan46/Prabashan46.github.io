@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>json create</title>
+    <title>json track</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -22,6 +22,7 @@
     let cones = []; // Array to store cone positions and rotations
     let pressStartTime;
     let entranceCenter = new THREE.Vector3(); // Entrance center position
+    let fileIndex = 1; // File index counter
 
     init();
     animate();
@@ -91,6 +92,8 @@
                 },
                 rotation: mesh.quaternion.toArray() 
             });
+
+            fileIndex++; // Increment file index
         }
 
         controller = renderer.xr.getController(0);
@@ -128,20 +131,10 @@
 
     }
 
-    // Function to generate an alphabetic string
-    function generateAlphabeticString(length) {
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-        return result;
-    }
-
     // Function to save cones to a JSON file with a unique filename
     async function saveConesToFile(cones) {
         const text = JSON.stringify(cones, null, 2);
-        const filename = `${generateAlphabeticString(1)}.json`; // Generate a unique alphabetic filename
+        const filename = `${fileIndex}.json`; // Generate filename with file index
         const blob = new Blob([text], { type: 'application/json' });
 
         if ('showSaveFilePicker' in window) {
