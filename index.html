@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Show cu</title>
+    <title>Show js</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
@@ -94,10 +94,10 @@
         }
     }
 
-    // Function to fetch cone data from cones.txt
+    // Function to fetch cone data from cones.json
     async function fetchConesData() {
         try {
-            const response = await fetch('cones.txt');
+            const response = await fetch('cones.json'); // Change from 'cones.txt' to 'cones.json'
             const data = await response.json();
             cones = data.map(cone => cone); // Changed to cone => cone
         } catch (error) {
