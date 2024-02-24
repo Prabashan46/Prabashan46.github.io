@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>new cuggggbes</title>
+    <title>new cuyyyybes</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
@@ -35,43 +35,6 @@
     let camera, scene, renderer;
     let controller;
     let cones = []; // Array to store cone positions
-    let pathData = {
-        "entrance": [
-            "kitchen",
-            "room1",
-            "sammyRoom",
-            "kitchen",
-            "room1",
-            "sammyRoom"
-        ],
-        "kitchen": [
-            "entrance",
-            "room1",
-            "sammyRoom",
-            "room1",
-            "sammyRoom"
-        ],
-        "room1": [
-            "entrance",
-            "kitchen",
-            "sammyRoom",
-            "restRoom",
-            "sammyRoom",
-            "restRoom"
-        ],
-        "sammyRoom": [
-            "entrance",
-            "kitchen",
-            "room1",
-            "restRoom",
-            "restRoom"
-        ],
-        "restRoom": [
-            "room1",
-            "sammyRoom"
-        ],
-        "room2": []
-    }; // Object to store path data
 
     init();
     animate();
@@ -134,12 +97,9 @@
     // Function to fetch cone data from cones.txt
     async function fetchConesData() {
         try {
-            // For testing, let's simulate cone data
-            cones = [
-                { position: { x: 0, y: 0, z: -2 } },
-                { position: { x: 1, y: 1, z: -3 } },
-                { position: { x: -1, y: -1, z: -4 } }
-            ];
+            const response = await fetch('cones.txt');
+            const data = await response.json();
+            cones = data;
         } catch (error) {
             console.error('Error fetching cone data:', error);
         }
