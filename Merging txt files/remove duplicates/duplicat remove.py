@@ -1,7 +1,7 @@
 import json
 
 # Define the input file name
-input_file = 'data.json'
+input_file = 'merged_cones.json'
 
 # Read JSON data from the file
 with open(input_file, 'r') as file:
