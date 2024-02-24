@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>json plane ref</title>
+    <title>json refer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link type="text/css" rel="stylesheet" href="main.css">
@@ -20,6 +20,7 @@
     let camera, scene, renderer;
     let controller;
     let cones = []; // Array to store cone positions and rotations
+    let pressStartTime;
     let referencePoint; // Reference point for cone placement
     let fileIndex = 1; // File index counter
 
@@ -56,6 +57,7 @@
         const geometry = new THREE.CylinderGeometry(0, 0.05, 0.2, 32).rotateX(Math.PI / 2);
 
         function onSelectStart(event) {
+            pressStartTime = Date.now(); // Capture start time for long press detection
             referencePoint = controller.position.clone(); // Set the reference point
         }
 
